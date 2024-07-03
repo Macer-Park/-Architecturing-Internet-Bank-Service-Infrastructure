@@ -194,7 +194,7 @@
       <div class="page_header floating_element">
         <img src="/icons/ubuntu-logo.png" alt="Ubuntu Logo" class="floating_element"/>
         <span class="floating_element">
-          Apache2 Ubuntu Default Page
+          Cloud & Web Engineer T2 Web Server
         </span>
       </div>
 <!--      <div class="table_of_contents floating_element">
@@ -220,25 +220,22 @@
 
         <div class="section_header section_header_red">
           <div id="about"></div>
-          Webhook & MySQL Expose with HTTPS Connection Establisehd Snapshoted!
+          ★ Team 4 FOREVER ★
         </div>
         <div class="content_section_text">
           <p>
-                This is the default welcome page used to test the correct 
-                operation of the Apache2 server after installation on Ubuntu systems.
-                It is based on the equivalent page on Debian, from which the Ubuntu Apache
-                packaging is derived.
-                If you can read this page, it means that the Apache HTTP server installed at
-                this site is working properly. You should <b>replace this file</b> (located at
-                <tt>/var/www/html/index.html</tt>) before continuing to operate your HTTP server.
-          </p>
+                팀원 분들께,
 
+                본 서버는 Webhook와 Github를 연동한 Push/Pull 작업 간 자동화 Reload기능을 제공합니다.
+                Webhook 기능을 사용하여 본 Repository에 작업물을 Push할 경우, 
+                본 서버에서 이를 자동으로 인식, POST하여 Server를 Reload 합니다.
+                
+                본 서버는 공인 Web 인증서 발급 기관을 통한 Certification 인증서 기반의 HTTPS(443) 웹 서버 입니다.
 
-          <p>
-                If you are a normal user of this web site and don't know what this page is
-                about, this probably means that the site is currently unavailable due to
-                maintenance.
-                If the problem persists, please contact the site's administrator.
+                server.js 파일에 해당 인증서를 참조한 서버 개설 구문이 포함되어 있으며,
+                이외에도 DB 연동을 위한 구문이 작성 되어있습니다.
+
+                보다 멋진 웹사이트를 만드시고자 하는 팀원분들의 노고에 감사드립니다.
           </p>
 
         </div>
@@ -248,117 +245,64 @@
         </div>
         <div class="content_section_text">
           <p>
-                Ubuntu's Apache2 default configuration is different from the
-                upstream default configuration, and split into several files optimized for
-                interaction with Ubuntu tools. The configuration system is
-                <b>fully documented in
-                /usr/share/doc/apache2/README.Debian.gz</b>. Refer to this for the full
-                documentation. Documentation for the web server itself can be
-                found by accessing the <a href="/manual">manual</a> if the <tt>apache2-doc</tt>
-                package was installed on this server.
-
+                본 서버는 아래와 같은 Directory 구조를 가지고 있습니다.
+                따라서 Webhook에 연동된 Github의 정보와 일치하며,
+                Github의 내용을 추가 또는 삭제 및 수정하여 Push할 경우.
+                <b>사전에 구현한 Python Script가 이를 인식,
+                자동으로 Server에 POST하여 Server를 즉시 Reload 합니다.</b>.
           </p>
           <p>
-                The configuration layout for an Apache2 web server installation on Ubuntu systems is as follows:
+                Ubuntu Server Directory 구조:
           </p>
           <pre>
-/etc/apache2/
-|-- apache2.conf
+/home/team4/project
+|-- server.js
 |       `--  ports.conf
-|-- mods-enabled
-|       |-- *.load
-|       `-- *.conf
-|-- conf-enabled
-|       `-- *.conf
-|-- sites-enabled
-|       `-- *.conf
+|-- views/
+|       |-- *.ejs
           </pre>
           <ul>
                         <li>
-                           <tt>apache2.conf</tt> is the main configuration
-                           file. It puts the pieces together by including all remaining configuration
-                           files when starting up the web server.
+                           <tt>server.js</tt> 수정 시 유의 사항.
+                           server.js에는 https와 DB 연동을 위한 구문이 있습니다.
+                           server.js를 직접적으로 수정시에는 편집에 유의 하시기 바랍니다.
                         </li>
 
                         <li>
-                           <tt>ports.conf</tt> is always included from the
-                           main configuration file. It is used to determine the listening ports for
-                           incoming connections, and this file can be customized anytime.
-                        </li>
-
-                        <li>
-                           Configuration files in the <tt>mods-enabled/</tt>,
-                           <tt>conf-enabled/</tt> and <tt>sites-enabled/</tt> directories contain
-                           particular configuration snippets which manage modules, global configuration
-                           fragments, or virtual host configurations, respectively.
-                        </li>
-
-                        <li>
-                           They are activated by symlinking available
-                           configuration files from their respective
-                           *-available/ counterparts. These should be managed
-                           by using our helpers
-                           <tt>
-                                <a href="http://manpages.debian.org/cgi-bin/man.cgi?query=a2enmod">a2enmod</a>,
-                                <a href="http://manpages.debian.org/cgi-bin/man.cgi?query=a2dismod">a2dismod</a>,
-                           </tt>
-                           <tt>
-                                <a href="http://manpages.debian.org/cgi-bin/man.cgi?query=a2ensite">a2ensite</a>,
-                                <a href="http://manpages.debian.org/cgi-bin/man.cgi?query=a2dissite">a2dissite</a>,
-                            </tt>
-                                and
-                           <tt>
-                                <a href="http://manpages.debian.org/cgi-bin/man.cgi?query=a2enconf">a2enconf</a>,
-                                <a href="http://manpages.debian.org/cgi-bin/man.cgi?query=a2disconf">a2disconf</a>
-                           </tt>. See their respective man pages for detailed information.
-                        </li>
-
-                        <li>
-                           The binary is called apache2. Due to the use of
-                           environment variables, in the default configuration, apache2 needs to be
-                           started/stopped with <tt>/etc/init.d/apache2</tt> or <tt>apache2ctl</tt>.
-                           <b>Calling <tt>/usr/bin/apache2</tt> directly will not work</b> with the
-                           default configuration.
+                           <tt>views</tt> 폴더에 내장되는 .ejs 확장자 파일들은,
+                           동일하게 Repository에서 Push 및 Pull 시도시에,
+                           서버의 Directory와 일치하게 동일하게 반영되므로, 폴더 추가 및 삭제시 유의 하시기 바랍니다.
                         </li>
           </ul>
         </div>
 
         <div class="section_header">
             <div id="docroot"></div>
-                Document Roots
+                당부 사항
         </div>
 
         <div class="content_section_text">
             <p>
-                By default, Ubuntu does not allow access through the web browser to
-                <em>any</em> file apart of those located in <tt>/var/www</tt>,
-                <a href="http://httpd.apache.org/docs/2.4/mod/mod_userdir.html">public_html</a>
-                directories (when enabled) and <tt>/usr/share</tt> (for web
-                applications). If your site is using a web document root
-                located elsewhere (such as in <tt>/srv</tt>) you may need to whitelist your
-                document root directory in <tt>/etc/apache2/apache2.conf</tt>.
-            </p>
-            <p>
-                The default Ubuntu document root is <tt>/var/www/html</tt>. You
-                can make your own virtual hosts under /var/www. This is different
-                to previous releases which provides better security out of the box.
+                본 서버는 AWS EC2 클라우드에 이식하기 전, 호환성 및 동작 확인과,
+                인프라 운영간의 과금을 방지하기 위함이기도 합니다.
+                따라서 본 서버는 스냅샷 기능을 실시간으로 지원하여 서버가 
+                오작동 하는 경우가 발생하더라도 전혀 문제가 없으므로.
+                금번 Mini Project외의 평소에 도전해보고 싶었던 요소가 있다면,
+                가감없이 추가하거나 삭제하여 현업의 환경과 유사한 서버에서
+                여러가지 시도를 통해 각자의 실력을 함양하셨으면 좋겠습니다.
             </p>
         </div>
 
         <div class="section_header">
           <div id="bugs"></div>
-                Reporting Problems
+                주말간의 작업 시 유의사항
         </div>
         <div class="content_section_text">
           <p>
-                Please use the <tt>ubuntu-bug</tt> tool to report bugs in the
-                Apache2 package with Ubuntu. However, check <a
-                href="https://bugs.launchpad.net/ubuntu/+source/apache2">existing
-                bug reports</a> before reporting a new bug.
-          </p>
-          <p>
-                Please report bugs specific to modules (such as PHP and others)
-                to respective packages, not to the web server itself.
+                금번 Mini Project 진행 간 주말에도 작업 지원이 가능하나,
+                실수 및 Commit오류로 인한 문제 발생에 대한 즉시 지원이 필요할 경우
+                Discord를 사용해 DM또는 서버내의 Mention 기능을 활용하여
+                서버 담당자를 호출해 주시기 바랍니다.
           </p>
         </div>
 
