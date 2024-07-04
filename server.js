@@ -27,20 +27,18 @@ app.get('/', (req, res) => {
   res.render('index', { user: req.session ? req.session.user : null });
 });
 
-/*
 // MySQL 연결 설정
 const db = mysql.createConnection({
-  host: 'localhost',
-  user: 'dbuser',
-  password: 'dbpassword',
-  database: 'dbname'
+  host: 'team4-mysql',
+  user: 'root',
+  password: 'team4',
+  database: 'team4_db_test'
 });
 
 db.connect((err) => {
   if (err) throw err;
   console.log('DB 연결 완료');
 });
-*/
 
 // HTTP 서버 시작
 app.listen(80, () => {
