@@ -1,6 +1,7 @@
 const express = require('express');
 const fs = require('fs');
 const https = require('https');
+const session = require('express-session');
 
 const app = express();
 app.set('view engine', 'ejs');
@@ -21,9 +22,15 @@ app.use((req, res, next) => {
   next();
 });
 
+app.use(session({
+  secret: 'your_secret_key',
+  resave: false,
+  saveUninitialized: true
+}));
+
 // index 페이지 라우트
 app.get('/', (req, res) => {
-  res.render('index');
+  res.render('index', { user: req.session.user });
 });
 
 // HTTP 서버 시작
@@ -35,4 +42,3 @@ app.listen(80, () => {
 https.createServer(httpsOptions, app).listen(443, () => {
   console.log('443 HTTPS 서버 대기중');
 });
-

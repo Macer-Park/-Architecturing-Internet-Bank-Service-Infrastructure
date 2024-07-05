@@ -51,7 +51,6 @@
         <h1>Welcome <%= user ? user.name : "Guest" %>님</h1>
         <% if (user) { %>
           <a href="/auth/logout" class="btn btn-danger">Logout</a>
-          <a href="/assets" class="btn btn-primary">View Assets</a>
           <% } else { %>
             <a href="/auth/login" class="btn btn-primary">Login</a>
             <a href="/auth/signup" class="btn btn-secondary">Register</a>

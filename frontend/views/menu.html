@@ -14,28 +14,25 @@
                     <a class="nav-link active" aria-current="page" href="/">Home</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="/assets">자산목록</a>
-                </li>
-                <% if (user && user.role==='admin' ) { %>
-                    <li class="nav-item">
+                    <% if (user && user.role==='admin' ) { %>
                         <a class="nav-link" href="/admin">관리자</a>
-                    </li>
-                    <% } %>
-                        <% if (!user) { %>
+                </li>
+                <% } %>
+                    <% if (!user) { %>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/auth/login">로그인</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/auth/signup">회원가입</a>
+                        </li>
+                        <% } else { %>
                             <li class="nav-item">
-                                <a class="nav-link" href="/auth/login">로그인</a>
+                                <a class="nav-link" href="/auth/logout">로그아웃</a>
                             </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="/auth/signup">회원가입</a>
-                            </li>
-                            <% } else { %>
+                            <% } %>
                                 <li class="nav-item">
-                                    <a class="nav-link" href="/auth/logout">로그아웃</a>
+                                    <a class="nav-link" href="/pending-requests">승인된 요청</a>
                                 </li>
-                                <% } %>
-                                    <li class="nav-item">
-                                        <a class="nav-link" href="/pending-requests">승인된 요청</a>
-                                    </li>
             </ul>
         </div>
     </div>
