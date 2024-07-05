@@ -1,93 +1,72 @@
-<!-- index.ejs -->
-
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>클라우드 엔지니어 양성과정 1기 4팀의 Mini Project</title>
-  <!-- Bootstrap CSS -->
-  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <title>Asset Management</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 
 <body>
+  <%- include('menu.html') %>
 
-  <header class="bg-dark text-white py-4">
-    <div class="container">
-      <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-        <a class="navbar-brand" href="#">변우석 프로젝트</a>
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
-          aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-          <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarNav">
-          <ul class="navbar-nav ml-auto">
-            <li class="nav-item active">
-              <a class="nav-link" href="#">홈</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="#">회사 소개</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="#">연락하기</a>
-            </li>
-          </ul>
+    <main role="main">
+      <section class="jumbotron text-center">
+        <div class="container">
+          <h1 class="display-4">환영합니다!</h1>
+          <p class="lead">당신이 이 사이트에 들어온 이상 웹 서버를 완성할 때 까지 절대 나갈수 없습니다!</p>
+          <a href="#" class="btn btn-primary btn-lg">변우석 팬미팅 하기</a>
         </div>
-      </nav>
-    </div>
-  </header>
+      </section>
 
-  <main role="main">
-
-    <section class="jumbotron text-center">
       <div class="container">
-        <h1 class="display-4">환영합니다!</h1>
-        <p class="lead">당신이 이 사이트에 들어온 이상 웹 서버를 완성할 때 까지 절대 나갈수 없습니다!</p>
-        <a href="#" class="btn btn-primary btn-lg">변우석 팬미팅 하기</a>
+        <div class="row">
+          <div class="col-md-4">
+            <div class="card mb-4 shadow-sm">
+              <div class="card-body">
+                <h2 class="card-title">팬미팅 장소</h2>
+                <p class="card-text">그분 집 앞</p>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="card mb-4 shadow-sm">
+              <div class="card-body">
+                <h2 class="card-title">팬미팅 시간</h2>
+                <p class="card-text">24시간</p>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="card mb-4 shadow-sm">
+              <div class="card-body">
+                <h2 class="card-title">팬미팅 티켓 예매</h2>
+                <p class="card-text">알아서</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <h1>Welcome <%= user ? user.name : "Guest" %>님</h1>
+        <% if (user) { %>
+          <a href="/auth/logout" class="btn btn-danger">Logout</a>
+          <a href="/assets" class="btn btn-primary">View Assets</a>
+          <% } else { %>
+            <a href="/auth/login" class="btn btn-primary">Login</a>
+            <a href="/auth/signup" class="btn btn-secondary">Register</a>
+            <% } %>
       </div>
-    </section>
+    </main>
 
-    <div class="container">
-      <div class="row">
-        <div class="col-md-4">
-          <div class="card mb-4 shadow-sm">
-            <div class="card-body">
-              <h2 class="card-title">팬미팅 장소</h2>
-              <p class="card-text">그분 집 앞</p>
-            </div>
-          </div>
-        </div>
-        <div class="col-md-4">
-          <div class="card mb-4 shadow-sm">
-            <div class="card-body">
-              <h2 class="card-title">팬미팅 시간</h2>
-              <p class="card-text">24시간</p>
-            </div>
-          </div>
-        </div>
-        <div class="col-md-4">
-          <div class="card mb-4 shadow-sm">
-            <div class="card-body">
-              <h2 class="card-title">팬미팅 티켓 예매</h2>
-              <p class="card-text">알아서</p>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
+    <footer class="text-center bg-dark text-white py-4">
+      <p>&copy; 2024 클라우드 엔지니어 양성 과정 1기생 Mini Project 4팀. 모든 권리 보유.</p>
+    </footer>
 
-  </main>
-
-  <footer class="text-center bg-dark text-white py-4">
-    <p>&copy; 2024 클라우드 엔지니어 양성 과정 1기생 Mini Project 4팀. 모든 권리 보유.</p>
-  </footer>
-
-  <!-- Bootstrap JS 및 필요한 기타 스크립트들 -->
-  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@1.16.1/dist/umd/popper.min.js"></script>
-  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-
+    <!-- Bootstrap JS 및 필요한 기타 스크립트들 -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@1.16.1/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
 
 </html>
