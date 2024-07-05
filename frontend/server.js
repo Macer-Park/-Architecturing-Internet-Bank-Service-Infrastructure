@@ -1,5 +1,4 @@
 const express = require('express');
-const mysql = require('mysql2');
 const fs = require('fs');
 const https = require('https');
 
@@ -24,20 +23,7 @@ app.use((req, res, next) => {
 
 // index 페이지 라우트
 app.get('/', (req, res) => {
-  res.render('index', { user: req.session ? req.session.user : null });
-});
-
-// MySQL 연결 설정
-const db = mysql.createConnection({
-  host: 'team4-mysql',
-  user: 'root',
-  password: 'team4',
-  database: 'team4_db_test'
-});
-
-db.connect((err) => {
-  if (err) throw err;
-  console.log('DB 연결 완료');
+  res.render('index');
 });
 
 // HTTP 서버 시작
