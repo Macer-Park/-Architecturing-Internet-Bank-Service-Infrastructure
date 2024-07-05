@@ -197,8 +197,6 @@ app.post('/board/delete', (req, res) => {
   res.send('공지사항 삭제 완료');
 });
 
-
-
 /* 최초 Commit Data
 const express = require('express');
 const mysql = require('mysql2');
