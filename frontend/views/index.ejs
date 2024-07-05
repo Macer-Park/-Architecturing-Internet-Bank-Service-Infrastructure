@@ -1,332 +1,93 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
-  <!--
-    Modified from the Debian original for Ubuntu
-    Last updated: 2014-03-19
-    See: https://launchpad.net/bugs/1288690
-  -->
-  <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-    <title>Apache2 Ubuntu Default Page: It works</title>
-    <style type="text/css" media="screen">
-      * {
-        margin: 0px 0px 0px 0px;
-        padding: 0px 0px 0px 0px;
-      }
+<!-- index.ejs -->
 
-      body,
-      html {
-        padding: 3px 3px 3px 3px;
+<!DOCTYPE html>
+<html lang="en">
 
-        background-color: #D8DBE2;
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>우리 프로젝트</title>
+  <!-- Bootstrap CSS -->
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
 
-        font-family: Verdana, sans-serif;
-        font-size: 11pt;
-        text-align: center;
-      }
+<body>
 
-      div.main_page {
-        position: relative;
-        display: table;
-
-        width: 800px;
-
-        margin-bottom: 3px;
-        margin-left: auto;
-        margin-right: auto;
-        padding: 0px 0px 0px 0px;
-
-        border-width: 2px;
-        border-color: #212738;
-        border-style: solid;
-
-        background-color: #FFFFFF;
-
-        text-align: center;
-      }
-
-      div.page_header {
-        height: 99px;
-        width: 100%;
-
-        background-color: #F5F6F7;
-      }
-
-      div.page_header span {
-        margin: 15px 0px 0px 50px;
-
-        font-size: 180%;
-        font-weight: bold;
-      }
-
-      div.page_header img {
-        margin: 3px 0px 0px 40px;
-
-        border: 0px 0px 0px;
-      }
-
-      div.table_of_contents {
-        clear: left;
-
-        min-width: 200px;
-
-        margin: 3px 3px 3px 3px;
-
-        background-color: #FFFFFF;
-
-        text-align: left;
-      }
-
-      div.table_of_contents_item {
-        clear: left;
-
-        width: 100%;
-
-        margin: 4px 0px 0px 0px;
-
-        background-color: #FFFFFF;
-
-        color: #000000;
-        text-align: left;
-      }
-
-      div.table_of_contents_item a {
-        margin: 6px 0px 0px 6px;
-      }
-
-      div.content_section {
-        margin: 3px 3px 3px 3px;
-
-        background-color: #FFFFFF;
-
-        text-align: left;
-      }
-
-      div.content_section_text {
-        padding: 4px 8px 4px 8px;
-
-        color: #000000;
-        font-size: 100%;
-      }
-
-      div.content_section_text pre {
-        margin: 8px 0px 8px 0px;
-        padding: 8px 8px 8px 8px;
-
-        border-width: 1px;
-        border-style: dotted;
-        border-color: #000000;
-
-        background-color: #F5F6F7;
-
-        font-style: italic;
-      }
-
-      div.content_section_text p {
-        margin-bottom: 6px;
-      }
-
-      div.content_section_text ul,
-      div.content_section_text li {
-        padding: 4px 8px 4px 16px;
-      }
-
-      div.section_header {
-        padding: 3px 6px 3px 6px;
-
-        background-color: #8E9CB2;
-
-        color: #FFFFFF;
-        font-weight: bold;
-        font-size: 112%;
-        text-align: center;
-      }
-
-      div.section_header_red {
-        background-color: #CD214F;
-      }
-
-      div.section_header_grey {
-        background-color: #9F9386;
-      }
-
-      .floating_element {
-        position: relative;
-        float: left;
-      }
-
-      div.table_of_contents_item a,
-      div.content_section_text a {
-        text-decoration: none;
-        font-weight: bold;
-      }
-
-      div.table_of_contents_item a:link,
-      div.table_of_contents_item a:visited,
-      div.table_of_contents_item a:active {
-        color: #000000;
-      }
-
-      div.table_of_contents_item a:hover {
-        background-color: #000000;
-
-        color: #FFFFFF;
-      }
-
-      div.content_section_text a:link,
-      div.content_section_text a:visited,
-      div.content_section_text a:active {
-        background-color: #DCDFE6;
-
-        color: #000000;
-      }
-
-      div.content_section_text a:hover {
-        background-color: #000000;
-
-        color: #DCDFE6;
-      }
-
-      div.validator {}
-    </style>
-  </head>
-  <body>
-    <div class="main_page">
-      <div class="page_header floating_element">
-        <img src="/icons/ubuntu-logo.png" alt="Ubuntu Logo" class="floating_element" />
-        <span class="floating_element">
-          Cloud & Web Engineer T2 Web Server
-        </span>
-      </div>
-      <!--      <div class="table_of_contents floating_element">
-        <div class="section_header section_header_grey">
-          TABLE OF CONTENTS
-        </div>
-        <div class="table_of_contents_item floating_element">
-          <a href="#about">About</a>
-        </div>
-        <div class="table_of_contents_item floating_element">
-          <a href="#changes">Changes</a>
-        </div>
-        <div class="table_of_contents_item floating_element">
-          <a href="#scope">Scope</a>
-        </div>
-        <div class="table_of_contents_item floating_element">
-          <a href="#files">Config files</a>
-        </div>
-      </div>
--->
-      <div class="content_section floating_element">
-
-
-        <div class="section_header section_header_red">
-          <div id="about"></div>
-          ★ Team 4 FOREVER ★
-        </div>
-        <div class="content_section_text">
-          <p>
-            팀원 분들께,
-
-            본 서버는 Webhook와 Github를 연동한 Push/Pull 작업 간 자동화 Reload기능을 제공합니다.
-            Webhook 기능을 사용하여 본 Repository에 작업물을 Push할 경우,
-            본 서버에서 이를 자동으로 인식, POST하여 Server를 Reload 합니다.
-
-            본 서버는 공인 Web 인증서 발급 기관을 통한 Certification 인증서 기반의 HTTPS(443) 웹 서버 입니다.
-
-            server.js 파일에 해당 인증서를 참조한 서버 개설 구문이 포함되어 있으며,
-            이외에도 DB 연동을 위한 구문이 작성 되어있습니다.
-
-            보다 멋진 웹사이트를 만드시고자 하는 팀원분들의 노고에 감사드립니다.
-          </p>
-
-        </div>
-        <div class="section_header">
-          <div id="changes"></div>
-          Configuration Overview
-        </div>
-        <div class="content_section_text">
-          <p>
-            본 서버는 아래와 같은 Directory 구조를 가지고 있습니다.
-            따라서 Webhook에 연동된 Github의 정보와 일치하며,
-            Github의 내용을 추가 또는 삭제 및 수정하여 Push할 경우.
-            <b>사전에 구현한 Python Script가 이를 인식,
-              자동으로 Server에 POST하여 Server를 즉시 Reload 합니다.</b>.
-          </p>
-          <p>
-            Ubuntu Server Directory 구조:
-          </p>
-          <pre>
-/home/team4/project
-|-- server.js
-|       `--  ports.conf
-|-- views/
-|       |-- *.ejs
-          </pre>
-          <ul>
-            <li>
-              <tt>server.js</tt> 수정 시 유의 사항.
-              server.js에는 https와 DB 연동을 위한 구문이 있습니다.
-              server.js를 직접적으로 수정시에는 편집에 유의 하시기 바랍니다.
+  <header class="bg-dark text-white py-4">
+    <div class="container">
+      <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <a class="navbar-brand" href="#">우리 프로젝트</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+          aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+          <ul class="navbar-nav ml-auto">
+            <li class="nav-item active">
+              <a class="nav-link" href="#">홈</a>
             </li>
-
-            <li>
-              <tt>views</tt> 폴더에 내장되는 .ejs 확장자 파일들은,
-              동일하게 Repository에서 Push 및 Pull 시도시에,
-              서버의 Directory와 일치하게 동일하게 반영되므로, 폴더 추가 및 삭제시 유의 하시기 바랍니다.
+            <li class="nav-item">
+              <a class="nav-link" href="#">회사 소개</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#">연락하기</a>
             </li>
           </ul>
         </div>
+      </nav>
+    </div>
+  </header>
 
-        <div class="section_header">
-          <div id="docroot"></div>
-          당부 사항
+  <main role="main">
+
+    <section class="jumbotron text-center">
+      <div class="container">
+        <h1 class="display-4">환영합니다!</h1>
+        <p class="lead">우리 프로젝트에 오신 것을 환영합니다. 우리가 제공하는 멋진 서비스를 확인하세요.</p>
+        <a href="#" class="btn btn-primary btn-lg">서비스 보기</a>
+      </div>
+    </section>
+
+    <div class="container">
+      <div class="row">
+        <div class="col-md-4">
+          <div class="card mb-4 shadow-sm">
+            <div class="card-body">
+              <h2 class="card-title">기능 1</h2>
+              <p class="card-text">이 기능은 무엇인가요? 간단히 설명해주세요.</p>
+            </div>
+          </div>
         </div>
-
-        <div class="content_section_text">
-          <p>
-            본 서버는 AWS EC2 클라우드에 이식하기 전, 호환성 및 동작 확인과,
-            인프라 운영간의 과금을 방지하기 위함이기도 합니다.
-            따라서 본 서버는 스냅샷 기능을 실시간으로 지원하여 서버가
-            오작동 하는 경우가 발생하더라도 전혀 문제가 없으므로.
-            금번 Mini Project외의 평소에 도전해보고 싶었던 요소가 있다면,
-            가감없이 추가하거나 삭제하여 현업의 환경과 유사한 서버에서
-            여러가지 시도를 통해 각자의 실력을 함양하셨으면 좋겠습니다.
-          </p>
+        <div class="col-md-4">
+          <div class="card mb-4 shadow-sm">
+            <div class="card-body">
+              <h2 class="card-title">기능 2</h2>
+              <p class="card-text">다음으로 이 기능을 소개합니다. 왜 중요한지 설명해주세요.</p>
+            </div>
+          </div>
         </div>
-
-        <div class="section_header">
-          <div id="bugs"></div>
-          주말간의 작업 시 유의사항
+        <div class="col-md-4">
+          <div class="card mb-4 shadow-sm">
+            <div class="card-body">
+              <h2 class="card-title">기능 3</h2>
+              <p class="card-text">여기에 추가적인 기능 설명을 적어주세요.</p>
+            </div>
+          </div>
         </div>
-        <div class="content_section_text">
-          <p>
-            금번 Mini Project 진행 간 주말에도 작업 지원이 가능하나,
-            실수 및 Commit오류로 인한 문제 발생에 대한 즉시 지원이 필요할 경우
-            Discord를 사용해 DM또는 서버내의 Mention 기능을 활용하여
-            서버 담당자를 호출해 주시기 바랍니다.
-          </p>
-        </div>
-
-        <div class="section_header">
-          <div id="bugs"></div>
-          테스트 중
-        </div>
-        <div class="content_section_text">
-          <p>
-            이훈석 : 테스트 중
-            왕선규 : 테스트 중
-            다원 : 테스트 중
-          </p>
-        </div>
-
-
-
       </div>
     </div>
-    <div class="validator">
-      <p>
-        <a href="http://validator.w3.org/check?uri=referer"><img src="http://www.w3.org/Icons/valid-xhtml10" alt="Valid XHTML 1.0 Transitional" height="31" width="88" /></a>
-      </p>
-    </div>
-  </body>
+
+  </main>
+
+  <footer class="text-center bg-dark text-white py-4">
+    <p>&copy; 2024 우리 프로젝트. 모든 권리 보유.</p>
+  </footer>
+
+  <!-- Bootstrap JS 및 필요한 기타 스크립트들 -->
+  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@1.16.1/dist/umd/popper.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+</body>
+
 </html>
