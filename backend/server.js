@@ -15,13 +15,12 @@ const app = express();
 //   key: fs.readFileSync('/home/team4/cert/private.key'),
 //   ca: fs.readFileSync('/home/team4/cert/ca_bundle.crt')
 // };
-
-/****** 미들웨어 설정 *******/
-app.use(express.static(path.join(__dirname, '../frontend/public'))); // frontend 정적 파일 제공
-
 // express 미들웨어 설정
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+/****** 미들웨어 설정 *******/
+app.use(express.static(path.join(__dirname, '../frontend/public'))); // frontend 정적 파일 제공
 
 // ejs 미들웨어 설정
 app.set('view engine', 'ejs');
@@ -52,8 +51,8 @@ app.use('/auth', require('./routes/auth'));
 /****** 미들웨어 설정 End *******/
 
 // HTTP 서버 시작
-app.listen(8080, () => {
-  console.log('8080 HTTP 서버 대기중');
+app.listen(80, () => {
+  console.log('80 HTTP 서버 대기중');
 });
 
 // // HTTPS 서버 시작 (사용할 경우)
