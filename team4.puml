@@ -1,0 +1,118 @@
+@startuml
+
+!define SHOW_NOTE ' 노트 표시 여부 ( 비활성화 시 주석 처리 )
+Title "송금에 대한 Sequence Diagram"
+
+'== 송금 시퀀스 ==
+'---------------------------------------------------
+' 스킨 정의
+'---------------------------------------------------
+skinparam Shadowing true
+
+skinparam participant {
+  BackgroundColor BUSINESS
+  BorderColor DARKRED
+  BorderThickness 1
+}
+
+skinparam database {
+  BackgroundColor DATABASE
+  BorderColor DARKRED
+}
+
+skinparam actor {
+  BackgroundColor ACTOR
+  BorderColor DARKRED
+  BorderThickness 2
+}
+
+skinparam sequence {
+  ArrowColor DARKRED
+  LifeLineBorderColor DARKRED
+  BoxBackgroundColor WHITE
+  BoxFontColor RoyalBlue
+  LifeLineBackgroundColor #FFBBBB
+}
+
+skinparam note {
+  BackgroundColor GOLD
+  BorderThickness 1
+  FontSize 10
+}
+
+hide unlinked
+
+' 리턴 메시지 박스 위치 ( 아래 )
+skinparam responseMessageBelowArrow true
+' 자동 넘버링
+autonumber "<B>[00]"
+
+'---------------------------------------------------
+' 객체 정의
+'---------------------------------------------------
+actor "User" as C order 1
+participant "My Account" as MA order 2
+participant "AUTH Comp." as AC order 3
+participant "Transfer Comp." as TC order 4
+database "DB" as DB order 5
+
+'---------------------------------------------------
+' 송금 시퀀스 다이어그램
+'---------------------------------------------------
+C -> MA : 내 계좌 조회 요청
+activate MA
+MA -> AC : 토큰 인증 요청
+activate AC
+AC --> MA : 토큰 인증 응답
+deactivate AC
+MA --> C : 내 계좌 조회 응답
+deactivate MA
+
+C -> MA : 송금 요청
+activate MA
+MA -> AC : 유저 재인증 요청
+deactivate MA
+
+activate AC
+
+AC -> DB : 유저 정보 요청
+activate DB
+DB --> AC : 유저 정보 응답
+deactivate DB
+
+AC --> MA : 유저 재인증 응답
+deactivate AC
+
+activate MA
+MA -> TC : 송금 요청
+deactivate MA
+
+activate TC
+TC -> DB : 송금 정보 갱신 요청
+activate DB
+DB --> TC : 송금 정보 갱신 후 전송
+deactivate DB
+
+TC --> MA : 송금 완료
+deactivate TC
+activate MA
+
+MA --> C : 송금 완료 내역 전달
+deactivate MA
+
+
+    alt 돈이 부족한 경우
+        TC -> DB : 잔액 확인 요청
+        activate DB
+        
+        DB --> TC : 잔액 부족 응답
+        deactivate DB
+        activate TC
+        TC --> MA : 송금 실패 (잔액 부족)
+        deactivate TC
+        activate MA
+        MA --> C : 송금 실패 알림 (잔액 부족)
+        deactivate MA
+    end
+
+@enduml
