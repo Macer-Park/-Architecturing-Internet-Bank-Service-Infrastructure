@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Fan Meeting Project</title>
+  <title>Fan Meeting Project - 로그인</title>
   <link rel="stylesheet" href="styles.css">
   <style>
     body {
@@ -35,16 +35,36 @@
       margin-top: 20px;
       display: flex;
       justify-content: center;
-      gap: 20px;
+      align-items: center;
+      height: calc(100vh - 120px);
     }
 
-    .card {
+    .form-container {
       background: white;
       border: 1px solid #ddd;
       border-radius: 5px;
       padding: 20px;
       text-align: center;
-      width: 150px;
+      width: 300px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .form-container input {
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+    }
+
+    .form-container button {
+      background-color: #007bff;
+      color: white;
+      padding: 10px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      width: 100%;
     }
 
     .footer {
@@ -66,14 +86,19 @@
       <a href="/auth/login">로그인</a>
       <a href="/auth/signup">회원가입</a>
     </div>
-    <h1>환영합니다!</h1>
-    <p>당신이 이 사이트에 들어온 이상 웹 서버를 완성할 때 까지 절대 나갈 수 없습니다!</p>
-    <button>변우석 팬미팅 하기</button>
   </div>
   <div class="content">
-    <div class="card">팬미팅 장소<br>그분 집 앞</div>
-    <div class="card">팬미팅 시간<br>24시간</div>
-    <div class="card">팬미팅 티켓 예매<br>알아봐</div>
+    <div class="form-container">
+      <h2>로그인</h2>
+      <form action="/auth/login" method="post">
+        <input type="text" id="username" name="username" placeholder="사용자명" required>
+        <input type="password" id="password" name="password" placeholder="비밀번호" required>
+        <button type="submit">로그인</button>
+      </form>
+      <% if (typeof msg !== 'undefined' && msg) { %>
+        <p><%= msg %></p>
+      <% } %>
+    </div>
   </div>
   <div class="footer">
     © 2024 클라우드 엔지니어 양성 과정 1기생 Mini Project 4팀. 모든 권리 보유.

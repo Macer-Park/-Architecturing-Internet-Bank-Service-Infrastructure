@@ -7,14 +7,6 @@ const path = require("path");
 const fs = require("fs");
 
 
-// DB 연결 설정
-let main_db, salt_db;
-setup().then((dbs) => {
-  main_db = dbs.main_db;
-  salt_db = dbs.salt_db;
-}).catch(err => {
-  console.error("DB 연결 실패: ", err);
-});
 
 
 // 로그인 페이지 렌더링
@@ -24,7 +16,8 @@ router.get('/login', (req, res) => {
 
 
 // 사용자 로그인 API
-router.post('/login', (req, res) => {
+router.post('/login', async(req, res) => {
+    const {main_db, salt_db} = await setup();
     const { username, password } = req.body; // username, password 추출
     const userQuery = 'SELECT * FROM user WHERE user_id = ?'; // userQurey에 사용자 정보 조회 정의
   
@@ -125,6 +118,7 @@ const upload = multer({ storage: storage });
 
 // 회원가입 API
 router.post('/signup', upload.single('idCard'), (req, res) => { // 파일 업로드 처리 
+  
   const { username, password, checkPassword, name } = req.body; // username, password, checkPassword, name 추출
   const idCardPath = req.file.path; // 업로드 파일 경로 저장
 

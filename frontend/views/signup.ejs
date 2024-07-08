@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fan Meeting Project - 회원가입</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+    }
+
+    .header {
+      background-color: #007bff;
+      color: white;
+      padding: 20px;
+      text-align: center;
+      position: relative;
+    }
+
+    .header .nav {
+      position: absolute;
+      top: 10px;
+      right: 20px;
+    }
+
+    .header .nav a {
+      color: white;
+      margin: 0 10px;
+      text-decoration: none;
+    }
+
+    .content {
+      margin-top: 20px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: calc(100vh - 120px);
+    }
+
+    .form-container {
+      background: white;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      padding: 20px;
+      text-align: left;
+      width: 300px; /* 폼의 전체 너비를 300px로 유지 */
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .form-container h2 {
+      text-align: center;
+    }
+
+    .form-container input {
+      width: calc(100% - 20px); /* 우측 공간 확보를 위해 입력 필드 너비 조정 */
+      padding: 10px;
+      margin: 10px 0;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+    }
+
+    .form-container button {
+      background-color: #007bff;
+      color: white;
+      padding: 10px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      width: calc(100% - 20px); /* 우측 공간 확보를 위해 버튼 너비 조정 */
+      margin-left: auto; /* 오른쪽 정렬 */
+      display: block; /* 버튼을 블록 요소로 변경 */
+    }
+
+    .footer {
+      background-color: #007bff;
+      color: white;
+      padding: 10px;
+      position: fixed;
+      bottom: 0;
+      width: 100%;
+      text-align: center;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="header">
+    <div class="nav">
+      <a href="#">Home</a>
+      <a href="/auth/login">로그인</a>
+      <a href="/auth/signup">회원가입</a>
+    </div>
+  </div>
+  <div class="content">
+    <div class="form-container">
+      <h2>회원가입</h2>
+      <form action="/auth/signup" method="post" enctype="multipart/form-data">
+        <input type="text" id="username" name="username" placeholder="아이디" required>
+        <input type="password" id="password" name="password" placeholder="비밀번호" required>
+        <input type="password" id="checkPassword" name="checkPassword" placeholder="비밀번호 확인" required>
+        <input type="text" id="name" name="name" placeholder="이름" required>
+        <input type="file" id="idCard" name="idCard" accept="image/*" required>
+        <button type="submit">회원가입</button>
+      </form>
+      <% if (typeof msg !== 'undefined' && msg) { %>
+        <p><%= msg %></p>
+      <% } %>
+    </div>
+  </div>
+  <div class="footer">
+    © 2024 클라우드 엔지니어 양성 과정 1기생 Mini Project 4팀. 모든 권리 보유.
+  </div>
+</body>
+
+</html>
