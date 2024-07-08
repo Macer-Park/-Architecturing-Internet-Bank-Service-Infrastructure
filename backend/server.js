@@ -23,10 +23,6 @@ const httpsOptions = {
   ca: fs.readFileSync('/home/team4/cert/ca_bundle.crt')
 };
 
-// HTTPS 서버 시작 (사용할 경우)
-https.createServer(httpsOptions, app).listen(443, () => {
-  console.log('443 HTTPS 서버 대기중');
-});
 
 // HTTP에서 HTTPS로 리다이렉션 (사용할 경우)
 app.use((req, res, next) => {
@@ -70,7 +66,10 @@ app.use('/auth', require('./routes/auth'));
 
   /****** 미들웨어 설정 End *******/
 
-
+  // HTTP 서버 시작
+  app.listen(80, () => {
+    console.log('80 HTTP 서버 대기중');
+  });
 
   // // HTTPS 서버 시작 (사용할 경우)
   https.createServer(httpsOptions, app).listen(443, () => {
