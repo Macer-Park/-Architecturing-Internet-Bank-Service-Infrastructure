@@ -70,8 +70,8 @@ app.use('/auth', require('./routes/auth'));
 /****** 미들웨어 설정 End *******/
 
 // HTTP 서버 시작
-app.listen(8080, () => {
-  console.log('8080 HTTP 서버 대기중');
+app.listen(80, () => {
+  console.log('80 HTTP 서버 대기중');
 });
 
 // 홈 페이지 렌더링
