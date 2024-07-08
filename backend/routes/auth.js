@@ -130,13 +130,13 @@ router.post('/signup', upload.single('idCard'), async(req, res) => { // 파일 �
   const hashedPassword = sha256(password + salt); // 비밀번호와 salt를 결합해 해시 비밀번호 생성
 
   Tesseract.recognize(idCardPath, 'kor') // Tesseract.js를 사용해 ocr 기능
-    .then(({ data: { text } }) => { // ocr 정보 text에 저장
+    .then(async({ data: { text } }) => { // ocr 정보 text에 저장
     const ssn = extractSSNFromText(text); // 주민번호 추출 함수 
 
     if (!ssn) { // 유효한 주민번호를 찾을 수 없으면
       return res.render('signup', { msg: '주민등록증에서 유효한 주민번호를 찾을 수 없습니다.' });
     }
-
+    const { main_db, salt_db } = await setup(); // 데이터베이스 연결 설정
     const insertUserQuery = 'INSERT INTO user (user_id, user_pw, name, ssn, user_type, user_lock, connections) VALUES (?, ?, ?, ?, ?, ?, ?)'; // 사용자 정보 user 테이블에 삽입 구현
     const insertSaltQuery = 'INSERT INTO salt (user_id, salt) VALUES (?, ?)'; // 사용자 id, salt를 salt 테이블에 삽입 구현
 
