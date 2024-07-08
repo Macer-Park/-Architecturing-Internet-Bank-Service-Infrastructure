@@ -9,12 +9,12 @@ const dotenv = require("dotenv").config();
 
 const app = express();
 
-// HTTPS 옵션 설정 (사용할 경우)
-const httpsOptions = {
-  cert: fs.readFileSync('/home/team4/cert/certificate.crt'),
-  key: fs.readFileSync('/home/team4/cert/private.key'),
-  ca: fs.readFileSync('/home/team4/cert/ca_bundle.crt')
-};
+  // HTTPS 옵션 설정 (사용할 경우)
+  const httpsOptions = {
+    cert: fs.readFileSync('/home/team4/cert/certificate.crt'),
+    key: fs.readFileSync('/home/team4/cert/private.key'),
+    ca: fs.readFileSync('/home/team4/cert/ca_bundle.crt')
+  };
 
 // express 미들웨어 설정
 app.use(express.json());
@@ -42,33 +42,41 @@ app.use(session({
   saveUninitialized: true
 }));
 
-// 라우팅 포함하는 코드
-app.use('/user', require('./routes/user')); 
-app.use('/account', require('./routes/account'));
-app.use('/admin', require('./routes/admin')); 
-app.use('/board', require('./routes/board'));
-app.use('/auth', require('./routes/auth'));
+// 데이터베이스 연결 설정
+setup().then(({main_db, salt_db}) => {
+  app.set('main_db', main_db);
+  app.set('salt_db', salt_db);
 
-/****** 미들웨어 설정 End *******/
+  // 라우팅 포함하는 코드
+  app.use('/user', require('./routes/user')); 
+  app.use('/account', require('./routes/account'));
+  app.use('/admin', require('./routes/admin')); 
+  app.use('/board', require('./routes/board'));
+  app.use('/auth', require('./routes/auth'));
 
-// HTTP 서버 시작
-app.listen(80, () => {
-  console.log('80 HTTP 서버 대기중');
-});
+  /****** 미들웨어 설정 End *******/
 
-// // HTTPS 서버 시작 (사용할 경우)
-https.createServer(httpsOptions, app).listen(443, () => {
-  console.log('443 HTTPS 서버 대기중');
-});
+  // HTTP 서버 시작
+  app.listen(80, () => {
+    console.log('80 HTTP 서버 대기중');
+  });
 
-// 홈 페이지 렌더링
-app.get('/', (req, res) => {
-  console.log("adsasasd"); 
-  res.render('index', { user: req.session.user });
-});
+  // // HTTPS 서버 시작 (사용할 경우)
+  https.createServer(httpsOptions, app).listen(443, () => {
+    console.log('443 HTTPS 서버 대기중');
+  });
 
-// 다른 페이지 렌더링
-app.get('/ss', (req, res) => {
-  console.log("vvvvvvv"); 
-  res.render('admin', { user: req.session.user });
+  // 홈 페이지 렌더링
+  app.get('/', (req, res) => {
+    console.log("adsasasd"); 
+    res.render('index', { user: req.session.user });
+  });
+
+  // 다른 페이지 렌더링
+  app.get('/ss', (req, res) => {
+    console.log("vvvvvvv"); 
+    res.render('admin', { user: req.session.user });
+  });
+}).catch(err => {
+  console.error("DB 연결 실패: ", err);
 });
