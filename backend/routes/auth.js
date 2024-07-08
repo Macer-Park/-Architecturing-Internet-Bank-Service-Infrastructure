@@ -1,69 +1,72 @@
-const router = require("express").Router(); // router 사용
+const router = require("express").Router();
 const setup = require("../db_setup");
-const sha256 = require("sha256");  // salt 사용
+const sha256 = require("sha256");
 const multer = require("multer");
 const Tesseract = require("tesseract.js");
 const path = require("path");
 const fs = require("fs");
 
+let main_db, salt_db;
+
+(async () => {
+  ({main_db, salt_db} = await setup());
+})();
+
 // 로그인 페이지 렌더링
 router.get('/login', (req, res) => {
-  res.render('login'); // 로그인 페이지 렌더링
+  res.render('login');
 });
 
 // 사용자 로그인 API
 router.post('/login', async (req, res) => {
-  const { main_db, salt_db } = await setup();
-  const { username, password } = req.body; // username, password 추출
-  const userQuery = 'SELECT * FROM user WHERE user_id = ?'; // userQurey에 사용자 정보 조회 정의
+  const { username, password } = req.body;
+  const userQuery = 'SELECT * FROM user WHERE user_id = ?';
 
-  main_db.query(userQuery, [username], (err, userResults) => { // 사용자 정보 userResults에 정보 저장
+  main_db.query(userQuery, [username], (err, userResults) => {
     if (err) {
       console.error(err);
       return res.status(500).send('Internal Server Error');
     }
 
-    if (userResults.length > 0) { // 조회된 사용자가 있으면
-      const user = userResults[0]; // 사용자 정보 user에 저장
+    if (userResults.length > 0) {
+      const user = userResults[0];
 
-      if (user.user_locked) { // 사용자가 잠겨있으면
+      if (user.account_locked) {
         return res.send('로그인 시도 잠금 중입니다. 관리자에게 문의하세요.');
       }
 
-      const saltQuery = 'SELECT salt FROM salt WHERE user_id = ?'; // saltQurey에 salt 조회 정의
-      salt_db.query(saltQuery, [user.internal_id], (err, saltResults) => { // salt 조회후 saltResults에 저장
+      const saltQuery = 'SELECT salt FROM salt WHERE user_id = ?';
+      salt_db.query(saltQuery, [user.id], (err, saltResults) => {
         if (err) {
           console.error(err);
           return res.status(500).send('Internal Server Error');
         }
 
-        const salt = saltResults[0].salt; // salt변수에 salt 저장
-        const hashedPassword = sha256(password + salt); // 비밀번호 salt 결합해 해시 비밀번호 생성
+        const salt = saltResults[0].salt;
+        const hashedPassword = sha256(password + salt);
 
-        if (user.user_pw === hashedPassword) { // 해시 비밀번호와 유저 비밀번호가 같으면
-          // 로그인 성공
-          const resetAttemptsQuery = 'UPDATE user SET connections = 0 WHERE internal_id = ?'; // 로그인 시도 횟수 초기화 정의
-          main_db.query(resetAttemptsQuery, [user.internal_id], (err) => { // 로그인 시도 횟수 초기화
+        if (user.password === hashedPassword) {
+          const resetAttemptsQuery = 'UPDATE user SET login_attempts = 0 WHERE id = ?';
+          main_db.query(resetAttemptsQuery, [user.id], (err) => {
             if (err) {
               console.error(err);
               return res.status(500).send('Internal Server Error');
             }
 
-            req.session.user = user; // 세션에 사용자 정보 저장
-            res.cookie('uid', username); // 사용자 이름 쿠키에 저장
-            res.redirect('/'); // 로그인 성공 후 home으로 리다이렉션
+            req.session.user = user;
+            res.cookie('uid', username);
+            res.redirect('/');
           });
-        } else { // 로그인 실패하면
-          // 로그인 실패
-          const loginAttempts = user.connections + 1; // 로그인 시도 횟수 증가
-          let accountLocked = false; // 계정 잠금 비활성화
+        } else {
+          const loginAttempts = user.login_attempts + 1;
+          let accountLocked = false;
 
-          if (loginAttempts >= 5) { // 로그인 시도횟수가 5이상이면
-            accountLocked = true; // 계정 잠금 활성화
+          if (loginAttempts >= 5) {
+            accountLocked = true;
           }
 
-          const updateAttemptsQuery = 'UPDATE user SET connections = ?, user_lock = ? WHERE internal_id = ?'; // 로그인 시도 횟수, 계정 잠금 상태 갱신 정의
-          main_db.query(updateAttemptsQuery, [loginAttempts, accountLocked, user.internal_id], (err) => { // 로그인 시도 횟수, 계정 잠금 상태 갱신
+          const updateAttemptsQuery = 'UPDATE user SET login_attempts = ?, account_locked = ? WHERE id = ?';
+          main_db.query(updateAttemptsQuery, [loginAttempts, accountLocked, user.id], (err) => {
             if (err) {
               console.error(err);
               return res.status(500).send('Internal Server Error');
@@ -72,7 +75,7 @@ router.post('/login', async (req, res) => {
           });
         }
       });
-    } else { // 조회한 사용자가 없으면
+    } else {
       res.render('login', { msg: '잘못된 사용자명 또는 비밀번호입니다. 다시 시도해주세요.' });
     }
   });
@@ -80,14 +83,14 @@ router.post('/login', async (req, res) => {
 
 // 사용자 로그아웃 API
 router.get('/logout', (req, res) => {
-  req.session.destroy(); // 세션 파기
-  res.clearCookie('uid'); // uid 쿠키 삭제
-  res.redirect('/'); // home으로 이동
+  req.session.destroy();
+  res.clearCookie('uid');
+  res.redirect('/');
 });
 
 // 회원가입 페이지 렌더링
 router.get('/signup', (req, res) => {
-  res.render('signup'); // 회원가입 페이지 렌더링
+  res.render('signup');
 });
 
 // uploads 디렉토리 생성 확인 및 생성
@@ -99,67 +102,67 @@ if (!fs.existsSync(uploadDir)) {
 // Multer 설정
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, uploadDir); // 업로드 디렉토리 설정
+    cb(null, uploadDir);
   },
   filename: (req, file, cb) => {
-    cb(null, `${Date.now()}-${file.originalname}`); // 파일 이름 설정
+    cb(null, `${Date.now()}-${file.originalname}`);
   }
 });
 const upload = multer({ storage: storage });
 
 // 회원가입 API
-router.post('/signup', upload.single('idCard'), async (req, res) => { // 파일 업로드 처리
-  const { main_db, salt_db } = await setup(); // 데이터베이스 연결 설정
-  const { username, password, checkPassword, name } = req.body; // username, password, checkPassword, name 추출
-  const idCardPath = req.file.path; // 업로드 파일 경로 저장
+router.post('/signup', upload.single('idCard'), (req, res) => {
+  const { username, password, checkPassword, name } = req.body;
+  const idCardPath = req.file.path;
 
-  if (password !== checkPassword) { // 비밀번호와 비밀번호 재입력 일치 확인
+  if (password !== checkPassword) {
     return res.render('signup', { msg: '비밀번호가 일치하지 않습니다.' });
   }
 
-  const salt = Math.random().toString(36).substring(2, 15); // 랜덤한 salt 생성
-  const hashedPassword = sha256(password + salt); // 비밀번호와 salt를 결합해 해시 비밀번호 생성
+  const salt = Math.random().toString(36).substring(2, 15);
+  const hashedPassword = sha256(password + salt);
 
-  try {
-    const { data: { text } } = await Tesseract.recognize(idCardPath, 'kor'); // Tesseract.js를 사용해 ocr 기능
-    const ssn = extractSSNFromText(text); // 주민번호 추출 함수
+  Tesseract.recognize(idCardPath, 'kor')
+    .then(({ data: { text } }) => {
+      const ssn = extractSSNFromText(text);
 
-    if (!ssn) { // 유효한 주민번호를 찾을 수 없으면
-      return res.render('signup', { msg: '주민등록증에서 유효한 주민번호를 찾을 수 없습니다.' });
-    }
-
-    const insertUserQuery = 'INSERT INTO user (user_id, user_pw, name, ssn, user_type, user_lock, connections) VALUES (?, ?, ?, ?, ?, ?, ?)';
-    const insertSaltQuery = 'INSERT INTO salt (user_id, salt) VALUES (?, ?)';
-
-    main_db.query(insertUserQuery, [username, hashedPassword, name, ssn, 'USER', 0, 0], (err, result) => {
-      if (err) {
-        console.error(err);
-        return res.status(500).send('Internal Server Error');
+      if (!ssn) {
+        return res.render('signup', { msg: '주민등록증에서 유효한 주민번호를 찾을 수 없습니다.' });
       }
 
-      const userId = result.insertId; // 삽입된 사용자의 ID를 가져옴
+      const insertUserQuery = 'INSERT INTO user (user_id, user_pw, name, ssn, user_type, user_lock, connections) VALUES (?, ?, ?, ?, ?, ?, ?)';
+      const insertSaltQuery = 'INSERT INTO salt (user_id, salt) VALUES (LAST_INSERT_ID(), ?)';
 
-      salt_db.query(insertSaltQuery, [userId, salt], (err) => { // salt db에 삽입
+      main_db.query(insertUserQuery, [username, hashedPassword, name, ssn, 'USER', 0, 0], (err, result) => {
         if (err) {
           console.error(err);
           return res.status(500).send('Internal Server Error');
         }
 
-        res.redirect('/auth/login'); // 회원가입 성공시 로그인 페이지로
+        const userId = result.insertId;
+
+        salt_db.query(insertSaltQuery, [salt], (err) => {
+          if (err) {
+            console.error(err);
+            return res.status(500).send('Internal Server Error');
+          }
+
+          res.redirect('/auth/login');
+        });
       });
+    })
+    .catch(err => {
+      console.error(err);
+      return res.status(500).send('OCR 처리 중 오류가 발생했습니다.');
     });
-  } catch (err) {
-    console.error(err);
-    return res.status(500).send('OCR 처리 중 오류가 발생했습니다.');
-  }
 });
 
-// 주민번호 추출 로직 구현
+// 주민번호 추출 로직 구현 
 function extractSSNFromText(text) {
   const ssnRegex = /\b\d{6}-\d{7}\b/;
   const match = text.match(ssnRegex);
   if (match) {
-    return match[0].replace('-', ''); // 하이픈을 제거하고 반환
+    return match[0].replace('-', '');
   }
   return null;
 }
