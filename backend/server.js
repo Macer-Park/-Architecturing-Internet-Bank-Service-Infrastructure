@@ -8,6 +8,8 @@ const setup = require("./db_setup");
 const dotenv = require("dotenv").config();
 const bodyParser = require("body-parser");
 const crypto = require("crypto");
+const cookieParser = require('cookie-parser');
+const csrf = require('csurf');
 
 const app = express();
 
@@ -61,10 +63,20 @@ app.use(session({
   saveUninitialized: true
 }));
 
+// CSRF 미들웨어 설정
+app.use(cookieParser());
+app.use(csrf({ cookie: true }));
+
+// 전역 CSRF 토큰 설정
+app.use((req, res, next) => {
+  res.locals.csrfToken = req.csrfToken();
+  next();
+});
+
 // 라우팅 포함하는 코드
-app.use('/user', require('./routes/user')); 
+app.use('/user', require('./routes/user'));
 app.use('/account', require('./routes/account'));
-app.use('/admin', require('./routes/admin')); 
+app.use('/admin', require('./routes/admin'));
 app.use('/board', require('./routes/board'));
 app.use('/auth', require('./routes/auth'));
 
