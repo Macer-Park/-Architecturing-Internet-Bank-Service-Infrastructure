@@ -20,24 +20,24 @@ const app = express();
  * 그래야, 외부서버에서 https 외부서버를 사용할 수 있다.
 */
 // //  HTTPS 옵션 설정 (사용할 경우)
-// const httpsOptions = {
-//   cert: fs.readFileSync('/home/team4/cert/certificate.crt'),
-//   key: fs.readFileSync('/home/team4/cert/private.key'),
-//   ca: fs.readFileSync('/home/team4/cert/ca_bundle.crt')
-// };
+const httpsOptions = {
+  cert: fs.readFileSync('/home/team4/cert/certificate.crt'),
+  key: fs.readFileSync('/home/team4/cert/private.key'),
+  ca: fs.readFileSync('/home/team4/cert/ca_bundle.crt')
+};
 
 // // HTTPS 서버 시작 (사용할 경우)
-// https.createServer(httpsOptions, app).listen(443, () => {
-//   console.log('443 HTTPS 서버 대기중');
-// });
+https.createServer(httpsOptions, app).listen(443, () => {
+  console.log('443 HTTPS 서버 대기중');
+});
 
 // // // HTTP에서 HTTPS로 리다이렉션 (사용할 경우)
-// app.use((req, res, next) => {
-//   if (!req.secure) {
-//     return res.redirect(['https://', req.get('Host'), req.url].join(''));
-//   }
-//   next();
-// });
+app.use((req, res, next) => {
+  if (!req.secure) {
+    return res.redirect(['https://', req.get('Host'), req.url].join(''));
+  }
+  next();
+});
 
 /***********************************************************************************/
 /***********************************************************************************/
