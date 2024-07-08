@@ -12,7 +12,7 @@ router.post('/auth/login', (req, res) => {
       if (userResults.length > 0) {
         const user = userResults[0];
   
-        if (user.account_locked) {
+        if (user.user_lock) {
           return res.send('로그인 시도 잠금 중입니다. 관리자에게 문의하세요.');
         }
   
@@ -25,7 +25,7 @@ router.post('/auth/login', (req, res) => {
   
           if (user.password === hashedPassword) {
             // 로그인 성공
-            const resetAttemptsQuery = 'UPDATE user SET login_attempts = 0 WHERE id = ?';
+            const resetAttemptsQuery = 'UPDATE user SET connections = 0 WHERE id = ?';
             db.query(resetAttemptsQuery, [user.id], (err) => {
               if (err) throw err;
   
@@ -35,18 +35,18 @@ router.post('/auth/login', (req, res) => {
             });
           } else {
             // 로그인 실패
-            const loginAttempts = user.login_attempts + 1;
+            const loginAttempts = user.connections + 1;
             let accountLocked = false;
   
             if (loginAttempts >= 5) {
               accountLocked = true;
-              const lockAccountQuery = 'UPDATE account SET account_locked = TRUE WHERE user_id = ?';
+              const lockAccountQuery = 'UPDATE account SET user_lock = TRUE WHERE user_id = ?';
               db.query(lockAccountQuery, [user.id], (err) => {
                 if (err) throw err;
               });
             }
   
-            const updateAttemptsQuery = 'UPDATE user SET login_attempts = ?, account_locked = ? WHERE id = ?';
+            const updateAttemptsQuery = 'UPDATE user SET connections = ?, user_lock = ? WHERE id = ?';
             db.query(updateAttemptsQuery, [loginAttempts, accountLocked, user.id], (err) => {
               if (err) throw err;
               res.render('login', { msg: '잘못된 사용자명 또는 비밀번호입니다. 다시 시도해주세요.' });
