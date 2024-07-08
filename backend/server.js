@@ -18,7 +18,7 @@ const app = express();
 
 /** https 설정 - 개발시에는 주석처리하고, 푸쉬 할 때는 해제를 해야한다. (반드시)
  * 그래야, 외부서버에서 https 외부서버를 사용할 수 있다.
-*/
+ */
 //  HTTPS 옵션 설정 (사용할 경우)
 const httpsOptions = {
   cert: fs.readFileSync('/home/team4/cert/certificate.crt'),
@@ -45,19 +45,12 @@ app.use((req, res, next) => {
 // express 미들웨어 설정
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(cookieParser());
 
 /****** 미들웨어 설정 *******/
 app.use(express.static(path.join(__dirname, '../frontend/public'))); // frontend 정적 파일 제공
 
-const csrfProtection = csrf({ cookie: true });
-
-app.use(csrfProtection);
-
-app.use((req, res, next) => {
-  res.locals.csrfToken = req.csrfToken();
-  next();
-});
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 // ejs 미들웨어 설정
 app.set('view engine', 'ejs');
@@ -70,11 +63,22 @@ app.use(session({
   saveUninitialized: true
 }));
 
+
+app.use(cookieParser());
+// CSRF 미들웨어 설정
+const csrfProtection = csrf({ cookie: true });
+
+// 전역 CSRF 토큰 설정
+app.use((req, res, next) => {
+  res.locals.csrfToken = req.csrfToken ? req.csrfToken() : '';
+  next();
+});
+
 // 라우팅 포함하는 코드
 app.use('/user', require('./routes/user'));
 app.use('/account', require('./routes/account'));
 app.use('/admin', require('./routes/admin'));
-app.use('/board', require('./routes/board'));
+app.use('/board', csrfProtection, require('./routes/board')); // CSRF 보호 적용
 app.use('/auth', require('./routes/auth'));
 
 /****** 미들웨어 설정 End *******/
