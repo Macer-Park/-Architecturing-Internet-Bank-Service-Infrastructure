@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>회원가입</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .signup-container {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 300px;
+        }
+        .signup-container h2 {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .signup-container form {
+            display: flex;
+            flex-direction: column;
+        }
+        .signup-container form input {
+            margin-bottom: 10px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+        }
+        .signup-container form button {
+            padding: 10px;
+            background-color: #007BFF;
+            color: #fff;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+        .signup-container form button:hover {
+            background-color: #0056b3;
+        }
+        .message {
+            color: red;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <%- include('menu.html') %>
+    <div class="signup-container">
+        <h2>회원가입</h2>
+        <% if (typeof msg !== 'undefined') { %>
+            <div class="message"><%= msg %></div>
+        <% } %>
+        <form action="/auth/signup" method="post">
+            <input type="text" name="user_id" placeholder="사용자 ID" required>
+            <input type="password" name="user_pw" placeholder="비밀번호" required>
+            <input type="text" name="name" placeholder="이름" required>
+            <input type="text" name="ssn" placeholder="주민등록번호" required>
+            <button type="submit">회원가입</button>
+        </form>
+    </div>
+</body>
+</html>

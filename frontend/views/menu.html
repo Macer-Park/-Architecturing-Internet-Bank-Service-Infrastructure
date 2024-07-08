@@ -1,6 +1,11 @@
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet"
-    integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous">
-<style>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
     .navbar {
         background-color: #007bff;
     }
@@ -34,46 +39,183 @@
         background-color: #0056b3;
     }
 </style>
+</head>
+<body>
 
-<nav class="navbar navbar-expand-lg navbar-dark">
-    <div class="container-fluid">
-        <a class="navbar-brand" href="#">변우석 프로젝트</a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
-            aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav ms-auto">
-                <li class="nav-item">
-                    <a class="nav-link active" aria-current="page" href="/">Home</a>
-                </li>
-                <% if (user && user.role==='admin' ) { %>
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container-fluid">
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
                     <li class="nav-item">
-                        <a class="nav-link" href="/admin">관리자</a>
+                        <a class="nav-link active" aria-current="page" href="/">Home</a>
                     </li>
-                    <% } %>
-                        <% if (!user) { %>
-                            <li class="nav-item">
-                                <a class="nav-link" href="/auth/login">로그인</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="/auth/signup">회원가입</a>
-                            </li>
-                            <% } else { %>
-                                <li class="nav-item">
-                                    <a class="nav-link" href="/auth/logout">로그아웃</a>
-                                </li>
-                                <% } %>
-                                    <li class="nav-item">
-                                        <a class="nav-link" href="/pending-requests">승인된 요청</a>
-                                    </li>
-            </ul>
+                    <li class="nav-item">
+                        <a class="nav-link active" aria-current="page" href="/">board</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" aria-current="page" href="/">MyPage</a>
+                    </li>
+                    <div id="signDiv" class="nav-item-group">
+                        <li class="nav-item" >
+                            <a class="nav-link" data-toggle="modal" data-target="#loginModal" >Login</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" data-toggle="modal" data-target="#signupModal" >Signup</a>
+                        </li>
+                    </div>
+
+
+                </ul>
+            </div>
+        </div>
+    </nav>
+    <!-- 로그인 모달 -->
+    <div class="modal fade" id="loginModal" tabindex="-1" aria-labelledby="loginModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="loginModalLabel">Login</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="loginForm">
+                        <div class="form-group">
+                            <label for="user_id">User ID</label>
+                            <input type="text" class="form-control" id="user_id" name="user_id" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="user_pw">Password</label>
+                            <input type="password" class="form-control" id="user_pw" name="user_pw" required>
+                        </div>
+                        <div class="alert alert-danger" id="loginErrMsg" style="display:none;"></div>
+                        <button type="submit" class="btn btn-primary">Login</button>
+                    </form>
+                </div>
+            </div>
         </div>
     </div>
-</nav>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
-    integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
-    crossorigin="anonymous"></script>
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.js"></script>
+    <!-- 회원가입 모달 -->
+    <!-- Signup Modal -->
+    <div class="modal fade" id="signupModal" tabindex="-1" aria-labelledby="signupModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="signupModalLabel">Sign Up</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="signupForm">
+                        <div class="form-group">
+                            <label for="signupId">User ID</label>
+                            <input type="text" class="form-control" id="signupId" name="user_id" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="signupPw">Password</label>
+                            <input type="password" class="form-control" id="signupPw" name="user_pw" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="signupName">Name</label>
+                            <input type="text" class="form-control" id="signupName" name="name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="signupBirth">Birthday</label>
+                            <input type="date" class="form-control" id="signupBirth" name="birthday" required>
+                        </div>
+                        <div class="alert alert-danger" id="signupErrMsg" style="display:none;"></div>
+                        <button type="submit" class="btn btn-primary">Sign Up</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS & dependencies -->
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>    
+    
+    <script>
+        // uid 쿠키 확인
+        const uid = $.cookie('uid');
+
+        // 쿠키 O -> logout button 
+        if (uid) {
+            $('#signDiv').html(`<li class="nav-item">
+                                    <a class="nav-link" href="javascript:void(0);" onclick="logout()">Logout</a>
+                                </li>`);
+        }
+
+        function logout() {
+            $.removeCookie('uid', { path: '/' });
+            location.href = '/user/logout';
+        }
+
+        // 회원가입 모달 제어
+        $(document).ready(function () {
+            $('#signupForm').on('submit', function (event) {
+                event.preventDefault(); // submit시, 창 새로고침 x
+
+                const formData = {
+                    user_id: $('#signupId').val(),
+                    user_pw: $('#signupPw').val(),
+                    name: $('#signupName').val(),
+                    birthday: $('#signupBirth').val()
+                };
+
+                $.ajax({
+                    type: 'POST',
+                    url: '/auth/signup',
+                    data: formData,
+                    success: function (response) { // 회원가입 성공
+                        $('#signupErrMsg').hide();
+                        alert(response.msg);
+                        $('#signupModal').modal('hide'); // 모달 창 닫기
+                    },
+                    error: function (response) { // 회원가입 실패 시 에러
+                        $('#signupErrMsg').text(response.responseJSON.msg).show();
+                    }
+                });
+            });
+        });
+
+        // 로그인 모달 제어
+        $(document).ready(function () {
+            $('#loginForm').on('submit', function (event) {
+                console.log("asdasdas");
+                event.preventDefault(); // submit시, 창 새로고침 x
+
+                const formData = {
+                    userid: $('#user_id').val(),
+                    userpw: $('#user_pw').val()
+                };
+
+                $.ajax({
+                    type: 'POST',
+                    url: '/auth/login',
+                    data: formData,
+                    success: function (response) { // 로그인 성공
+                        $('#loginErrMsg').hide();
+                        alert(response.msg);
+                        $('#loginModal').modal('hide'); // 모달 창 닫기
+                    },
+                    error: function (response) { // 로그인 실패 시 에러
+                        $('#loginErrMsg').text(response.responseJSON.msg).show();
+                    }
+                });
+            });
+        });
+    </script>
+
+</body>
+</html>
