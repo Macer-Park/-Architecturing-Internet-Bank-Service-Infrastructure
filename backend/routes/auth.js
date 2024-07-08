@@ -30,12 +30,12 @@ router.post('/login', async(req, res) => {
       if (userResults.length > 0) { // 조회된 사용자가 있으면
         const user = userResults[0]; // 사용자 정보 user에 저장
   
-        if (user.account_locked) { //사용자가 잠겨있으면
+        if (user.user_locked) { //사용자가 잠겨있으면
           return res.send('로그인 시도 잠금 중입니다. 관리자에게 문의하세요.');
         }
   
-        const saltQuery = 'SELECT salt FROM salt WHERE user_id = ?'; // slatQurey에 salt 조회 정의
-        salt_db.query(saltQuery, [user.id], (err, saltResults) => { // salt 조회후 saltResults에 저장
+        const saltQuery = 'SELECT salt FROM salt WHERE user_id = ?'; // saltQurey에 salt 조회 정의
+        salt_db.query(saltQuery, [user.internal_id], (err, saltResults) => { // salt 조회후 saltResults에 저장
           if (err) {
             console.error(err);
             return res.status(500).send('Internal Server Error');
@@ -44,10 +44,10 @@ router.post('/login', async(req, res) => {
           const salt = saltResults[0].salt; // salt변수에 salt 저장
           const hashedPassword = sha256(password + salt); // 비밀번호 salt 결합해 해시 비밀번호 생성
   
-          if (user.password === hashedPassword) { // 해시 비밀번호와 유저 비밀번호가 같으면
+          if (user.user_pw === hashedPassword) { // 해시 비밀번호와 유저 비밀번호가 같으면
             // 로그인 성공
-            const resetAttemptsQuery = 'UPDATE user SET login_attempts = 0 WHERE id = ?'; // 로그인 시도 횟수 초기화 정의
-            main_db.query(resetAttemptsQuery, [user.id], (err) => { // 로그인 시도 횟수 초기화
+            const resetAttemptsQuery = 'UPDATE user SET connections = 0 WHERE internal_id = ?'; // 로그인 시도 횟수 초기화 정의
+            main_db.query(resetAttemptsQuery, [user.internal_id], (err) => { // 로그인 시도 횟수 초기화
               if (err) {
                 console.error(err);
                 return res.status(500).send('Internal Server Error');
@@ -59,15 +59,15 @@ router.post('/login', async(req, res) => {
             });
           } else { // 로그인 실패하면
             // 로그인 실패
-            const loginAttempts = user.login_attempts + 1; // 로그인 시도 횟수 증가
+            const loginAttempts = user.connections + 1; // 로그인 시도 횟수 증가
             let accountLocked = false; // 계정 잠금 비활성화
   
             if (loginAttempts >= 5) { // 로그인 시도횟수가 5이상이면
               accountLocked = true; // 계정 잠금 활성화
             }
   
-            const updateAttemptsQuery = 'UPDATE user SET login_attempts = ?, account_locked = ? WHERE id = ?'; // 로그인 시도 횟수, 계정 잠금 상태 갱신 정의
-            main_db.query(updateAttemptsQuery, [loginAttempts, accountLocked, user.id], (err) => { // 로그인 시도 횟수, 계정 잠금 상태 갱신
+            const updateAttemptsQuery = 'UPDATE user SET connections = ?, user_lock = ? WHERE internal_id = ?'; // 로그인 시도 횟수, 계정 잠금 상태 갱신 정의
+            main_db.query(updateAttemptsQuery, [loginAttempts, accountLocked, user.internal_id], (err) => { // 로그인 시도 횟수, 계정 잠금 상태 갱신
               if (err) {
                 console.error(err);
                 return res.status(500).send('Internal Server Error');
@@ -117,8 +117,8 @@ const upload = multer({ storage: storage });
 
 
 // 회원가입 API
-router.post('/signup', upload.single('idCard'), (req, res) => { // 파일 업로드 처리 
-  
+router.post('/signup', upload.single('idCard'), async(req, res) => { // 파일 업로드 처리 
+  const {main_db, salt_db} = await setup();
   const { username, password, checkPassword, name } = req.body; // username, password, checkPassword, name 추출
   const idCardPath = req.file.path; // 업로드 파일 경로 저장
 
@@ -131,14 +131,14 @@ router.post('/signup', upload.single('idCard'), (req, res) => { // 파일 업로
 
   Tesseract.recognize(idCardPath, 'kor') // Tesseract.js를 사용해 ocr 기능
     .then(({ data: { text } }) => { // ocr 정보 text에 저장
-    const ssn = extractSSNFromText(text); // 주민번호 추출 함수 (구현 필요)
+    const ssn = extractSSNFromText(text); // 주민번호 추출 함수 
 
     if (!ssn) { // 유효한 주민번호를 찾을 수 없으면
       return res.render('signup', { msg: '주민등록증에서 유효한 주민번호를 찾을 수 없습니다.' });
     }
 
     const insertUserQuery = 'INSERT INTO user (user_id, user_pw, name, ssn, user_type, user_lock, connections) VALUES (?, ?, ?, ?, ?, ?, ?)'; // 사용자 정보 user 테이블에 삽입 구현
-    const insertSaltQuery = 'INSERT INTO salt (user_id, salt) VALUES (LAST_INSERT_ID(), ?)'; // 사용자 id, salt를 salt 테이블에 삽입 구현
+    const insertSaltQuery = 'INSERT INTO salt (user_id, salt) VALUES (?, ?)'; // 사용자 id, salt를 salt 테이블에 삽입 구현
 
     main_db.query(insertUserQuery, [username, hashedPassword, name, ssn, 'USER', 0, 0], (err, result) => { // username, hashedPassword, name, ssn를 db에 삽입
       if (err) {
@@ -148,7 +148,7 @@ router.post('/signup', upload.single('idCard'), (req, res) => { // 파일 업로
 
       const userId = result.insertId; // 삽입된 사용자의 ID를 가져옴
       
-      salt_db.query(insertSaltQuery, [salt], (err) => { // salt db에 삽입
+      salt_db.query(insertSaltQuery, [userId, salt], (err) => { // salt db에 삽입
         if (err) {
           console.error(err);
           return res.status(500).send('Internal Server Error');
