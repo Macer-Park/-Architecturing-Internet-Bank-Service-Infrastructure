@@ -15,18 +15,34 @@ const csrfProtection = csrf({ cookie: true });
 
 
 // 특정 카테고리의 게시물 목록
-router.get('/list/:category', async (req, res) => {
+router.get('/list/:category', csrfProtection, async (req, res) => {
     const category = req.params.category;
-    const query = `SELECT * FROM board WHERE category = ? ORDER BY created_at DESC`;
+    const page = parseInt(req.query.page) || 1;
+    const itemsPerPage = 10; // 페이지당 항목 수
+    const offset = (page - 1) * itemsPerPage;
+
+    const countQuery = `SELECT COUNT(*) AS count FROM board WHERE category = ?`;
+    const listQuery = `SELECT * FROM board WHERE category = ? ORDER BY created_at DESC LIMIT ? OFFSET ?`;
 
     try {
         const main_db = await checkDbConnection();
-        const [rows] = await main_db.query(query, [category]);
 
-        // todo 나중에 지우기
-        req.session.user = { user_id: 1, user_type: 'admin' };
+        // 전체 항목 수 가져오기
+        const [countRows] = await main_db.query(countQuery, [category]);
+        const totalItems = countRows[0].count;
+        const totalPages = Math.ceil(totalItems / itemsPerPage);
 
-        res.render('board/list', { user: req.session.user, data: rows, category });
+        // 항목 목록 가져오기
+        const [rows] = await main_db.query(listQuery, [category, itemsPerPage, offset]);
+
+        res.render('board/list', {
+            user: req.session.user,
+            data: rows,
+            category,
+            currentPage: page,
+            totalPages,
+            csrfToken: req.csrfToken()
+        });
     } catch (error) {
         console.error(error);
         res.status(500).send(error.message);
