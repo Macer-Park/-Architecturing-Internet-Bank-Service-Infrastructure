@@ -16,6 +16,19 @@
       color: white;
       padding: 20px;
       text-align: center;
+      position: relative;
+    }
+
+    .header .nav {
+      position: absolute;
+      top: 10px;
+      right: 20px;
+    }
+
+    .header .nav a {
+      color: white;
+      margin: 0 10px;
+      text-decoration: none;
     }
 
     .content {
@@ -48,6 +61,11 @@
 
 <body>
   <div class="header">
+    <div class="nav">
+      <a href="#">Home</a>
+      <a href="#">로그인</a>
+      <a href="#">회원가입</a>
+    </div>
     <h1>환영합니다!</h1>
     <p>당신이 이 사이트에 들어온 이상 웹 서버를 완성할 때 까지 절대 나갈 수 없습니다!</p>
     <button>변우석 팬미팅 하기</button>
