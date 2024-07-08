@@ -7,6 +7,8 @@ const https = require('https');
 const setup = require("./db_setup");
 const dotenv = require("dotenv").config();
 const bodyParser = require("body-parser");
+const csrf = require('csurf');
+const cookieParser = require('cookie-parser');
 
 const app = express();
 
@@ -53,6 +55,16 @@ app.use(session({
   resave: false,
   saveUninitialized: true
 }));
+
+// CSRF 미들웨어 설정
+app.use(cookieParser());
+app.use(csrf({ cookie: true }));
+
+// 전역 CSRF 토큰 설정
+app.use((req, res, next) => {
+  res.locals.csrfToken = req.csrfToken();
+  next();
+});
 
 // 데이터베이스 연결 설정
 
