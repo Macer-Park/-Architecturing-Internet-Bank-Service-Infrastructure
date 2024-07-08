@@ -6,14 +6,10 @@ const Tesseract = require("tesseract.js");
 const path = require("path");
 const fs = require("fs");
 
-
-
-
 // 로그인 페이지 렌더링
 router.get('/login', (req, res) => {
   res.render('login'); // 로그인 페이지 렌더링
 });
-
 
 // 사용자 로그인 API
 router.post('/login', async(req, res) => {
@@ -81,7 +77,6 @@ router.post('/login', async(req, res) => {
       }
     });
   });
-  
 
 // 사용자 로그아웃 API
 router.get('/logout', (req, res) => { 
@@ -89,20 +84,17 @@ router.get('/logout', (req, res) => {
   res.clearCookie('uid'); // uid 쿠키 삭제
   res.redirect('/'); // home으로 이동
 });
-  
-  
+
 // 회원가입 페이지 렌더링
 router.get('/signup', (req, res) => {
   res.render('signup'); // 회원가입 페이지 렌더링
 });
 
-  
 // uploads 디렉토리 생성 확인 및 생성
 const uploadDir = path.join(__dirname, '../uploads');
 if (!fs.existsSync(uploadDir)) {
   fs.mkdirSync(uploadDir);
 }
-
 
 // Multer 설정
 const storage = multer.diskStorage({
@@ -115,10 +107,8 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage: storage });
 
-
 // 회원가입 API
 router.post('/signup', upload.single('idCard'), async(req, res) => { // 파일 업로드 처리 
-  const {main_db, salt_db} = await setup();
   const { username, password, checkPassword, name } = req.body; // username, password, checkPassword, name 추출
   const idCardPath = req.file.path; // 업로드 파일 경로 저장
 
@@ -131,39 +121,39 @@ router.post('/signup', upload.single('idCard'), async(req, res) => { // 파일 �
 
   Tesseract.recognize(idCardPath, 'kor') // Tesseract.js를 사용해 ocr 기능
     .then(async({ data: { text } }) => { // ocr 정보 text에 저장
-    const ssn = extractSSNFromText(text); // 주민번호 추출 함수 
+      const ssn = extractSSNFromText(text); // 주민번호 추출 함수 
 
-    if (!ssn) { // 유효한 주민번호를 찾을 수 없으면
-      return res.render('signup', { msg: '주민등록증에서 유효한 주민번호를 찾을 수 없습니다.' });
-    }
-    const { main_db, salt_db } = await setup(); // 데이터베이스 연결 설정
-    const insertUserQuery = 'INSERT INTO user (user_id, user_pw, name, ssn, user_type, user_lock, connections) VALUES (?, ?, ?, ?, ?, ?, ?)'; // 사용자 정보 user 테이블에 삽입 구현
-    const insertSaltQuery = 'INSERT INTO salt (user_id, salt) VALUES (?, ?)'; // 사용자 id, salt를 salt 테이블에 삽입 구현
-
-    main_db.query(insertUserQuery, [username, hashedPassword, name, ssn, 'USER', 0, 0], (err, result) => { // username, hashedPassword, name, ssn를 db에 삽입
-      if (err) {
-        console.error(err);
-        return res.status(500).send('Internal Server Error');
+      if (!ssn) { // 유효한 주민번호를 찾을 수 없으면
+        return res.render('signup', { msg: '주민등록증에서 유효한 주민번호를 찾을 수 없습니다.' });
       }
-
-      const userId = result.insertId; // 삽입된 사용자의 ID를 가져옴
       
-      salt_db.query(insertSaltQuery, [userId, salt], (err) => { // salt db에 삽입
+      const { main_db, salt_db } = await setup(); // 데이터베이스 연결 설정
+      const insertUserQuery = 'INSERT INTO user (user_id, user_pw, name, ssn, user_type, user_lock, connections) VALUES (?, ?, ?, ?, ?, ?, ?)'; // 사용자 정보 user 테이블에 삽입 구현
+      const insertSaltQuery = 'INSERT INTO salt (user_id, salt) VALUES (?, ?)'; // 사용자 id, salt를 salt 테이블에 삽입 구현
+
+      main_db.query(insertUserQuery, [username, hashedPassword, name, ssn, 'USER', 0, 0], (err, result) => { // username, hashedPassword, name, ssn를 db에 삽입
         if (err) {
           console.error(err);
           return res.status(500).send('Internal Server Error');
         }
 
-        res.redirect('/auth/login'); // 회원가입 성공시 로그인 페이지로
-      });
-    });
-  })
-  .catch(err => {
-    console.error(err);
-    return res.status(500).send('OCR 처리 중 오류가 발생했습니다.');
-  });
-});
+        const userId = result.insertId; // 삽입된 사용자의 ID를 가져옴
+        
+        salt_db.query(insertSaltQuery, [userId, salt], (err) => { // salt db에 삽입
+          if (err) {
+            console.error(err);
+            return res.status(500).send('Internal Server Error');
+          }
 
+          res.redirect('/auth/login'); // 회원가입 성공시 로그인 페이지로
+        });
+      });
+    })
+    .catch(err => {
+      console.error(err);
+      return res.status(500).send('OCR 처리 중 오류가 발생했습니다.');
+    });
+});
 
 // 주민번호 추출 로직 구현 
 function extractSSNFromText(text) {
@@ -174,6 +164,5 @@ function extractSSNFromText(text) {
   }
   return null;
 }
-  
 
 module.exports = router;
