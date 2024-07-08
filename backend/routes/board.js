@@ -1,6 +1,19 @@
 const router = require("express").Router();
 const { checkDbConnection } = require("../common/utils/dbUtils");
 
+const csrf = require('csurf');
+const csrfProtection = csrf({ cookie: true });
+
+// CSRF 토큰을 모든 뷰에 전역으로 전달
+// router.use(csrfProtection); // 모든 라우트에 CSRF 미들웨어 적용
+
+// router.use(function(req, res, next) {
+//   res.locals.csrfToken = req.csrfToken();
+//   next();
+// });
+
+
+
 // 특정 카테고리의 게시물 목록
 router.get('/list/:category', async (req, res) => {
     const category = req.params.category;
@@ -9,6 +22,10 @@ router.get('/list/:category', async (req, res) => {
     try {
         const main_db = await checkDbConnection();
         const [rows] = await main_db.query(query, [category]);
+
+        // todo 나중에 지우기
+        req.session.user = { user_id: 1, user_type: 'admin' };
+
         res.render('board/list', { user: req.session.user, data: rows, category });
     } catch (error) {
         console.error(error);
@@ -37,13 +54,20 @@ router.get('/content/:id', async (req, res) => {
 
 
 // 공지사항 추가 폼
-router.get('/insert', (req, res) => {
-  res.render('board/insert');
+router.get('/insert', csrfProtection, (req, res) => {
+    if (!req.session.user || req.session.user.user_type.toLowerCase() !== 'admin') {
+        return res.status(403).send('권한이 없습니다');
+    }
+    res.render('board/insert', { user: req.session.user, csrfToken: req.csrfToken() });
 });
 
 
 // 공지사항 추가 처리
-router.post('/insert', async (req, res) => {
+router.post('/insert', csrfProtection, async (req, res) => {
+    if (!req.session.user || req.session.user.user_type.toLowerCase() !== 'admin') {
+        return res.status(403).send('권한이 없습니다');
+    }
+
     const { title, content, category } = req.body;
     const query = `INSERT INTO board (title, content, category) VALUES (?, ?, ?)`;
 
@@ -60,6 +84,9 @@ router.post('/insert', async (req, res) => {
 
 // 공지사항 수정 페이지
 router.get('/update/:id', async (req, res) => {
+    if (!req.session.user || req.session.user.user_type.toLowerCase() !== 'admin') {
+        return res.status(403).send('권한이 없습니다');
+    }
     const main_db = await checkDbConnection();
     const board_id = req.params.id;
     const query = `SELECT * FROM board WHERE board_id = ?`;
@@ -67,7 +94,7 @@ router.get('/update/:id', async (req, res) => {
     try {
         const [rows] = await main_db.query(query, [board_id]);
         if (rows.length > 0) {
-            res.render('board/update', { user: req.session.user, board: rows[0] });
+            res.render('board/update', { user: req.session.user, board: rows[0], csrfToken: req.csrfToken() });
         } else {
             res.status(404).send('공지사항을 찾을 수 없습니다');
         }
@@ -78,7 +105,10 @@ router.get('/update/:id', async (req, res) => {
 });
 
 // 공지사항 수정 처리
-router.post('/update/:id', async (req, res) => {
+router.post('/update/:id', csrfProtection, async (req, res) => {
+    if (!req.session.user || req.session.user.user_type.toLowerCase() !== 'admin') {
+        return res.status(403).send('권한이 없습니다');
+    }
     const { title, content } = req.body;
     const board_id = req.params.id;
     const query = `UPDATE board SET title = ?, content = ?, updated_at = NOW() WHERE board_id = ?`;

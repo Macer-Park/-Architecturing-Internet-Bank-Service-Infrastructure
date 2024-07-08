@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>공지사항 상세</title>
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+  </head>
+  <body>
+    <div class="container">
+      <h1 class="mt-4">공지사항 상세</h1>
+      <div class="card">
+        <div class="card-header">
+          <h2><%= board.title %></h2>
+        </div>
+        <div class="card-body">
+          <p><%= board.content %></p>
+          <p class="text-muted">작성일: <%= new Date(board.created_at).toLocaleString() %></p>
+          <% if (board.updated_at) { %>
+          <p class="text-muted">수정일: <%= new Date(board.updated_at).toLocaleString() %></p>
+          <% } %>
+        </div>
+        <div class="card-footer">
+          <a href="/board/list" class="btn btn-secondary">목록으로</a>
+          <% if (user && user.user_type === 'admin') { %>
+          <a href="/board/update/<%= board.board_id %>" class="btn btn-warning">수정</a>
+          <% } %>
+        </div>
+      </div>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+  </body>
+</html>
