@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>공지사항 목록</title>
+  <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+<div class="container">
+  <h1 class="mt-4">인터넷뱅킹 고객센터</h1>
+
+  <!-- 탭 메뉴 -->
+  <ul class="nav nav-tabs">
+    <li class="nav-item">
+      <a class="nav-link <%= category === 'default' ? 'active' : '' %>" href="/board/list/default">기본</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link <%= category === 'notice' ? 'active' : '' %>" href="/board/list/notice">공지사항</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link <%= category === 'event' ? 'active' : '' %>" href="/board/list/event">이벤트</a>
+    </li>
+  </ul>
+
+  <div class="mb-3 mt-3">
+    <% if (user && user.user_type === 'admin') { %>
+      <a href="/board/insert" class="btn btn-primary">글 작성</a>
+    <% } %>
+  </div>
+
+  <table class="table table-striped">
+    <thead>
+    <tr>
+      <th>ID</th>
+      <th>제목</th>
+      <th>작성일</th>
+      <th>삭제</th>
+    </tr>
+    </thead>
+    <tbody>
+    <% data.forEach(board => { %>
+      <tr>
+        <td><%= board.board_id %></td>
+        <td><a href="/board/content/<%= board.board_id %>"><%= board.title %></a></td>
+        <td><%= new Date(board.created_at).toLocaleString() %></td>
+        <td>
+          <form action="/board/delete" method="post" onsubmit="return confirm('정말 삭제하시겠습니까?');">
+            <input type="hidden" name="board_id" value="<%= board.board_id %>">
+            <button type="submit" class="btn btn-danger btn-sm">삭제</button>
+          </form>
+        </td>
+      </tr>
+    <% }) %>
+    </tbody>
+  </table>
+
+  <!-- Pagination -->
+  <nav aria-label="Page navigation">
+    <ul class="pagination">
+      <% if (currentPage > 1) { %>
+        <li class="page-item">
+          <a class="page-link" href="/board/list/<%= category %>?page=<%= currentPage - 1 %>" aria-label="Previous">
+            <span aria-hidden="true">&laquo;</span>
+          </a>
+        </li>
+      <% } %>
+      <% for (let i = 1; i <= totalPages; i++) { %>
+        <li class="page-item <%= i === currentPage ? 'active' : '' %>">
+          <a class="page-link" href="/board/list/<%= category %>?page=<%= i %>"><%= i %></a>
+        </li>
+      <% } %>
+      <% if (currentPage < totalPages) { %>
+        <li class="page-item">
+          <a class="page-link" href="/board/list/<%= category %>?page=<%= currentPage + 1 %>" aria-label="Next">
+            <span aria-hidden="true">&raquo;</span>
+          </a>
+        </li>
+      <% } %>
+    </ul>
+  </nav>
+
+</div>
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>

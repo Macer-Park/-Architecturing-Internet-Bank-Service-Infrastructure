@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Fan Meeting Project - 회원가입</title>
+  <title>Fan Meeting Project - 로그인</title>
   <link rel="stylesheet" href="styles.css">
   <style>
     body {
@@ -44,17 +44,13 @@
       border: 1px solid #ddd;
       border-radius: 5px;
       padding: 20px;
-      text-align: left;
-      width: 300px; /* 폼의 전체 너비를 300px로 유지 */
+      text-align: center;
+      width: 300px;
       box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     }
 
-    .form-container h2 {
-      text-align: center;
-    }
-
     .form-container input {
-      width: calc(100% - 20px); /* 우측 공간 확보를 위해 입력 필드 너비 조정 */
+      width: 100%;
       padding: 10px;
       margin: 10px 0;
       border: 1px solid #ddd;
@@ -68,9 +64,7 @@
       border: none;
       border-radius: 5px;
       cursor: pointer;
-      width: calc(100% - 20px); /* 우측 공간 확보를 위해 버튼 너비 조정 */
-      margin-left: auto; /* 오른쪽 정렬 */
-      display: block; /* 버튼을 블록 요소로 변경 */
+      width: 100%;
     }
 
     .footer {
@@ -95,14 +89,11 @@
   </div>
   <div class="content">
     <div class="form-container">
-      <h2>회원가입</h2>
-      <form action="/auth/signup" method="post" enctype="multipart/form-data">
-        <input type="text" id="username" name="username" placeholder="아이디" required>
+      <h2>로그인</h2>
+      <form action="/auth/login" method="post">
+        <input type="text" id="username" name="username" placeholder="사용자명" required>
         <input type="password" id="password" name="password" placeholder="비밀번호" required>
-        <input type="password" id="checkPassword" name="checkPassword" placeholder="비밀번호 확인" required>
-        <input type="text" id="name" name="name" placeholder="이름" required>
-        <input type="file" id="idCard" name="idCard" accept="image/*" required>
-        <button type="submit">회원가입</button>
+        <button type="submit">로그인</button>
       </form>
       <% if (typeof msg !== 'undefined' && msg) { %>
         <p><%= msg %></p>
