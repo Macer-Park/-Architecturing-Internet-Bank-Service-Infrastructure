@@ -220,68 +220,59 @@ router.post('/signup', upload.single('idCard'), (req, res) => {
   // 사용자 ID 중복 확인
   const checkUserQuery = 'SELECT * FROM user WHERE user_id = ?';
 
-  main_db.query(checkUserQuery, [username], (err, results) =>{
+  main_db.query(checkUserQuery, [username], (err, results) => {
     if (err) {
       console.error('Error checking user ID:', err);
       return res.status(500).json({ msg: 'Internal Server Error' });
     }
-  })
 
-  if (password !== checkPassword) {
-    console.log('Passwords do not match');
-    return res.status(400).json({ msg: '비밀번호가 일치하지 않습니다.' });
-    console.log('Passwords do not match');
-    return res.status(400).json({ msg: '비밀번호가 일치하지 않습니다.' });
-  }
+    if (results.length > 0) {
+      return res.status(400).json({ msg: '이미 존재하는 사용자명입니다.' });
+    }
 
-  const salt = Math.random().toString(36).substring(2, 15);
-  const hashedPassword = sha256(password + salt);
+    if (password !== checkPassword) {
+      return res.status(400).json({ msg: '비밀번호가 일치하지 않습니다.' });
+    }
 
-  Tesseract.recognize(idCardPath, 'kor')
-    .then(({ data: { text } }) => {
-      const ssn = extractSSNFromText(text);
+    const salt = Math.random().toString(36).substring(2, 15);
+    const hashedPassword = sha256(password + salt);
 
-      if (!ssn) {
-        console.log('No valid SSN found in ID card');
-        return res.status(400).json({ msg: '주민등록증에서 유효한 주민번호를 찾을 수 없습니다.' });
-        console.log('No valid SSN found in ID card');
-        return res.status(400).json({ msg: '주민등록증에서 유효한 주민번호를 찾을 수 없습니다.' });
-      }
+    Tesseract.recognize(idCardPath, 'kor')
+      .then(({ data: { text } }) => {
+        const ssn = extractSSNFromText(text);
 
-      const insertUserQuery = 'INSERT INTO user (user_id, user_pw, name, ssn, user_type, user_lock, connections) VALUES (?, ?, ?, ?, ?, ?, ?)';
-      const insertSaltQuery = 'INSERT INTO salt (user_id, salt) VALUES (?, ?)';
+        if (!ssn) {
+          return res.status(400).json({ msg: '주민등록증에서 유효한 주민번호를 찾을 수 없습니다.' });
+        }
 
-      main_db.query(insertUserQuery, [username, hashedPassword, name, ssn, 'USER', 0, 0], (err, result) => {
+        const insertUserQuery = 'INSERT INTO user (user_id, user_pw, name, ssn, user_type, user_lock, connections) VALUES (?, ?, ?, ?, ?, ?, ?)';
+        const insertSaltQuery = 'INSERT INTO salt (user_id, salt) VALUES (?, ?)';
 
-        salt_db.query(insertSaltQuery, [username, salt], (err) => {
+        main_db.query(insertUserQuery, [username, hashedPassword, name, ssn, 'USER', 0, 0], (err, result) => {
           if (err) {
             console.error('Error inserting user:', err);
             return res.status(500).json({ msg: 'Internal Server Error' });
           }
 
           const userId = result.insertId;
-          console.log('User inserted with ID:', userId);
 
-          console.log('Executing query to insert salt...');
           salt_db.query(insertSaltQuery, [userId, salt], (err) => {
             if (err) {
               console.error('Error inserting salt:', err);
               return res.status(500).json({ msg: 'Internal Server Error' });
             }
 
-            console.log('Salt inserted for user ID:', userId);
             res.status(200).json({ msg: '회원가입이 완료되었습니다.' });
           });
         });
+      })
+      .catch(err => {
+        console.error('Error during OCR:', err);
+        return res.status(500).json({ msg: 'OCR 처리 중 오류가 발생했습니다.' });
       });
-    })
-    .catch(err => {
-      console.error('Error during OCR:', err);
-      return res.status(500).json({ msg: 'OCR 처리 중 오류가 발생했습니다.' });
-      console.error('Error during OCR:', err);
-      return res.status(500).json({ msg: 'OCR 처리 중 오류가 발생했습니다.' });
-    });
+  });
 });
+
 
 
 

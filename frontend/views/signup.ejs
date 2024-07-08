@@ -83,6 +83,40 @@
       text-align: center;
     }
   </style>
+    <script>
+      document.addEventListener("DOMContentLoaded", function() {
+        const form = document.querySelector("form");
+        form.addEventListener("submit", function(event) {
+          event.preventDefault();
+  
+          const formData = new FormData(form);
+  
+          fetch("/auth/signup", {
+            method: "POST",
+            body: formData
+          })
+          .then(response => response.json())
+          .then(result => {
+            if (result.msg) {
+              alert(result.msg);
+              if (result.msg.includes("이미 존재하는 사용자명")) {
+                form.querySelector("#username").value = "";
+              }
+              if (result.msg.includes("비밀번호가 일치하지 않습니다")) {
+                form.querySelector("#password").value = "";
+                form.querySelector("#checkPassword").value = "";
+              }
+              if (result.msg.includes("주민등록증에서 유효한 주민번호를 찾을 수 없습니다")) {
+                form.querySelector("#idCard").value = "";
+              }
+            }
+          })
+          .catch(error => {
+            console.error("Error:", error);
+          });
+        });
+      });
+    </script>
 </head>
 
 <body>
