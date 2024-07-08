@@ -23,7 +23,7 @@ router.post('/auth/login', (req, res) => {
           const salt = saltResults[0].salt;
           const hashedPassword = sha256(password + salt);
   
-          if (user.password === hashedPassword) {
+          if (user.password === hashedPassword) { 
             // 로그인 성공
             const resetAttemptsQuery = 'UPDATE user SET connections = 0 WHERE id = ?';
             db.query(resetAttemptsQuery, [user.id], (err) => {
