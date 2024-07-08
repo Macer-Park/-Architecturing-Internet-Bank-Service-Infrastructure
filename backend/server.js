@@ -79,22 +79,14 @@ app.use('/auth', require('./routes/auth'));
   https.createServer(httpsOptions, app).listen(443, () => {
     console.log('443 HTTPS 서버 대기중');
   });
-// HTTP 서버 시작
-app.listen(8080, () => {
-  console.log('8080 HTTP 서버 대기중');
-});
 
   // 홈 페이지 렌더링
   app.get('/', (req, res) => {
     console.log("adsasasd"); 
     res.render('index', { user: req.session.user });
   });
-// 홈 페이지 렌더링
-app.get('/', (req, res) => {
-  res.render('index', { user: req.session.user });
-});
 
-// 다른 페이지 렌더링
-app.get('/ss', (req, res) => {
-  res.render('admin', { user: req.session.user });
-});
+  // 다른 페이지 렌더링
+  app.get('/ss', (req, res) => {
+    res.render('admin', { user: req.session.user });
+  });
