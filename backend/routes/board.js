@@ -12,8 +12,6 @@ const csrfProtection = csrf({ cookie: true });
 //   next();
 // });
 
-
-
 // 특정 카테고리의 게시물 목록
 router.get('/list/:category', csrfProtection, async (req, res) => {
     const category = req.params.category;

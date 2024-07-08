@@ -47,9 +47,6 @@ app.use(express.urlencoded({ extended: true }));
 /****** 미들웨어 설정 *******/
 app.use(express.static(path.join(__dirname, '../frontend/public'))); // frontend 정적 파일 제공
 
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-
 // ejs 미들웨어 설정
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, '../frontend/views')); // EJS 템플릿 위치 설정
@@ -72,7 +69,7 @@ app.use('/auth', require('./routes/auth'));
 
 // HTTP 서버 시작
 app.listen(80, () => {
-  console.log('8080 HTTP 서버 대기중');
+  console.log('80 HTTP 서버 대기중');
 });
 
 // 홈 페이지 렌더링

@@ -59,85 +59,24 @@
                     <li class="nav-item">
                         <a class="nav-link active" aria-current="page" href="/">MyPage</a>
                     </li>
-                    <div id="signDiv" class="nav-item-group">
-                        <li class="nav-item" >
-                            <a class="nav-link" data-toggle="modal" data-target="#loginModal" >Login</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" data-toggle="modal" data-target="#signupModal" >Signup</a>
-                        </li>
-                    </div>
+                    <li class="nav-item">
+                        <a class="nav-link active login" aria-current="page" href="/auth/login">login</a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link active" aria-current="page" href="/auth/signup">signup</a>
+                    </li>
+
+                   
 
 
                 </ul>
             </div>
         </div>
     </nav>
-    <!-- 로그인 모달 -->
-    <div class="modal fade" id="loginModal" tabindex="-1" aria-labelledby="loginModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="loginModalLabel">Login</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <form id="loginForm">
-                        <div class="form-group">
-                            <label for="user_id">User ID</label>
-                            <input type="text" class="form-control" id="user_id" name="user_id" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="user_pw">Password</label>
-                            <input type="password" class="form-control" id="user_pw" name="user_pw" required>
-                        </div>
-                        <div class="alert alert-danger" id="loginErrMsg" style="display:none;"></div>
-                        <button type="submit" class="btn btn-primary">Login</button>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
+    
 
-    <!-- 회원가입 모달 -->
-    <!-- Signup Modal -->
-    <div class="modal fade" id="signupModal" tabindex="-1" aria-labelledby="signupModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="signupModalLabel">Sign Up</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <form id="signupForm">
-                        <div class="form-group">
-                            <label for="signupId">User ID</label>
-                            <input type="text" class="form-control" id="signupId" name="user_id" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="signupPw">Password</label>
-                            <input type="password" class="form-control" id="signupPw" name="user_pw" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="signupName">Name</label>
-                            <input type="text" class="form-control" id="signupName" name="name" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="signupBirth">Birthday</label>
-                            <input type="date" class="form-control" id="signupBirth" name="birthday" required>
-                        </div>
-                        <div class="alert alert-danger" id="signupErrMsg" style="display:none;"></div>
-                        <button type="submit" class="btn btn-primary">Sign Up</button>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
-
+    
     <!-- Bootstrap JS & dependencies -->
     <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.js"></script>
@@ -151,14 +90,14 @@
 
         // 쿠키 O -> logout button 
         if (uid) {
-            $('#signDiv').html(`<li class="nav-item">
+            $('.login').html(`<li class="nav-item">
                                     <a class="nav-link" href="javascript:void(0);" onclick="logout()">Logout</a>
                                 </li>`);
         }
 
         function logout() {
             $.removeCookie('uid', { path: '/' });
-            location.href = '/user/logout';
+            location.href = '/auth/logout';
         }
 
         // 회원가입 모달 제어

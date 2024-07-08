@@ -12,6 +12,68 @@ let main_db, salt_db;
   ({main_db, salt_db} = await setup());
 })();
 
+/************************************************************************************************************************************ */
+/********************************* Google Authenticator Start *********************************************************** */
+/************************************************************************************************************************************ */
+
+const speakeasy = require('speakeasy');
+const qrcode = require('qrcode');
+
+// // 관리자 계정 생성 및 Secret Key 생성
+// router.get("/qrcode", async (req,res) => {
+
+//   // 여기서 google Authorizer를 쓴다.       
+//    auth_secret = speakeasy.generateSecret({
+//     name: "Authorizer-authReal"
+//   });
+//   console.log("auth_secret : ", auth_secret);
+
+//   // 생성한 Secret Key를 기반으로 QR 코드 생성(URL) - 2
+//   console.log("auth_secret.otpauth_url : ", auth_secret.otpauth_url);
+//   qrcode.toDataURL(auth_secret.otpauth_url, function(err, data) {
+//     if(err){
+//       console.error('Error generating QR code:', err);
+//       return res.status(500).send('Error generating QR code');
+//     }
+//       console.log("data : ", data);
+
+//       const filePath = path.join(__dirname, '..', 'test-qrcode.html');
+//       // res.sendFile(filePath);
+//       res.render("test-qrcode.ejs", {qrcode_data: data});
+//       // res.render("test-qrcode.ejs");
+//   });
+
+// })
+
+/** 관리자 2차 인증 url */
+router.get("/verify", async (req,res) => {
+  res.render("adminTwo");
+})
+
+router.post("/verify", (req, res) => {
+
+  const code = req.body.code;
+  console.log("code : ", code);
+  // ajax를 통해 전달받은 데이터를 token에다가 넣어야 한다.
+  var verified = speakeasy.totp.verify({
+    secret: "dz81bN1ZwsXKKzzo>>3e}lsBV9v<1Ow9", // qrcode ascii를 요기다가 넣어주면 된다.
+    encoding: 'ascii',
+    token: code
+  });
+
+  console.log("verified : ",verified);
+
+  if(verified){
+    res.json({ msg: 'Verification successful' });
+  } else {
+    res.status(400).json({ msg: 'Verification failed' });
+  }
+})
+
+/************************************************************************************************************************************ */
+/********************************* Google Authenticator End *********************************************************** */
+/************************************************************************************************************************************ */
+
 // 로그인 페이지 렌더링
 router.get('/login', (req, res) => {
   res.render('login');
@@ -22,6 +84,8 @@ router.post('/login', async (req, res) => {
   const { username, password } = req.body;
   const userQuery = 'SELECT * FROM user WHERE user_id = ?';
 
+
+
   main_db.query(userQuery, [username], (err, userResults) => {
     if (err) {
       console.error(err);
@@ -31,42 +95,51 @@ router.post('/login', async (req, res) => {
     if (userResults.length > 0) {
       const user = userResults[0];
 
-      if (user.account_locked) {
+      if (user.user_lock) {
         return res.send('로그인 시도 잠금 중입니다. 관리자에게 문의하세요.');
       }
 
       const saltQuery = 'SELECT salt FROM salt WHERE user_id = ?';
-      salt_db.query(saltQuery, [user.id], (err, saltResults) => {
+      salt_db.query(saltQuery, [user.user_id], (err, saltResults) => {
         if (err) {
           console.error(err);
           return res.status(500).send('Internal Server Error');
         }
 
+        
+
+
         const salt = saltResults[0].salt;
         const hashedPassword = sha256(password + salt);
 
-        if (user.password === hashedPassword) {
-          const resetAttemptsQuery = 'UPDATE user SET login_attempts = 0 WHERE id = ?';
+        if (user.user_pw === hashedPassword) {
+          const resetAttemptsQuery = 'UPDATE user SET connections = 0 WHERE user_id = ?';
           main_db.query(resetAttemptsQuery, [user.id], (err) => {
             if (err) {
               console.error(err);
               return res.status(500).send('Internal Server Error');
             }
 
-            req.session.user = user;
-            res.cookie('uid', username);
-            res.redirect('/');
+            // 관리자 인가?
+            if (user.user_type == "admin"){
+              // 관리자 2차인증 거쳐야 한다.
+              console.log("user.user_type : ", user.user_type);
+            } else {
+              req.session.user = user;
+              res.cookie('uid', username);
+              res.redirect('/');
+            }
           });
         } else {
-          const loginAttempts = user.login_attempts + 1;
-          let accountLocked = false;
+          const loginAttempts = user.connections + 1;
+          let userLock = false;
 
           if (loginAttempts >= 5) {
-            accountLocked = true;
+            userLock = true;
           }
 
-          const updateAttemptsQuery = 'UPDATE user SET login_attempts = ?, account_locked = ? WHERE id = ?';
-          main_db.query(updateAttemptsQuery, [loginAttempts, accountLocked, user.id], (err) => {
+          const updateAttemptsQuery = 'UPDATE user SET connections = ?, user_lock = ? WHERE user_id = ?';
+          main_db.query(updateAttemptsQuery, [loginAttempts, userLock, user.user_id], (err) => {
             if (err) {
               console.error(err);
               return res.status(500).send('Internal Server Error');
@@ -83,9 +156,17 @@ router.post('/login', async (req, res) => {
 
 // 사용자 로그아웃 API
 router.get('/logout', (req, res) => {
-  req.session.destroy();
-  res.clearCookie('uid');
-  res.redirect('/');
+  req.session.destroy((err) => {
+    if (err) {
+      console.error("세션 파괴 중 오류 발생:", err);
+      return res.status(500).send("서버 오류로 로그아웃 실패");
+    } else {
+      // res.clearCookie('uid');
+      res.render("index");
+      // res.render("mainPage.ejs");
+        // res.send("/user/logout");
+    }
+  });
 });
 
 // 회원가입 페이지 렌더링
@@ -131,7 +212,7 @@ router.post('/signup', upload.single('idCard'), (req, res) => {
       }
 
       const insertUserQuery = 'INSERT INTO user (user_id, user_pw, name, ssn, user_type, user_lock, connections) VALUES (?, ?, ?, ?, ?, ?, ?)';
-      const insertSaltQuery = 'INSERT INTO salt (user_id, salt) VALUES (LAST_INSERT_ID(), ?)';
+      const insertSaltQuery = 'INSERT INTO salt (user_id, salt) VALUES (?, ?)';
 
       main_db.query(insertUserQuery, [username, hashedPassword, name, ssn, 'USER', 0, 0], (err, result) => {
         if (err) {
@@ -141,7 +222,7 @@ router.post('/signup', upload.single('idCard'), (req, res) => {
 
         const userId = result.insertId;
 
-        salt_db.query(insertSaltQuery, [salt], (err) => {
+        salt_db.query(insertSaltQuery, [username, salt], (err) => {
           if (err) {
             console.error(err);
             return res.status(500).send('Internal Server Error');
