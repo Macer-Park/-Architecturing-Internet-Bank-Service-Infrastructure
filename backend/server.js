@@ -70,10 +70,7 @@ app.use('/auth', require('./routes/auth'));
 
   /****** 미들웨어 설정 End *******/
 
-  // HTTP 서버 시작
-  app.listen(80, () => {
-    console.log('80 HTTP 서버 대기중');
-  });
+
 
   // // HTTPS 서버 시작 (사용할 경우)
   https.createServer(httpsOptions, app).listen(443, () => {
