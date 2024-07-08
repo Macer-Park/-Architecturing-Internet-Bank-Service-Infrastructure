@@ -104,7 +104,7 @@ router.post('/login', async (req, res) => {
       const user = userResults[0];
 
       if (user.user_lock) {
-        return res.send('로그인 시도 잠금 중입니다. 관리자에게 문의하세요.');
+        return res.status(403).json({ msg: '로그인 시도 잠금 중입니다. 관리자에게 문의하세요.' });
       }
 
       const saltQuery = 'SELECT salt FROM salt WHERE user_id = ?';
@@ -112,6 +112,11 @@ router.post('/login', async (req, res) => {
 
         if (err) {
           console.error(err);
+          return res.status(500).json({ msg: 'Internal Server Error' });
+        }
+
+        if (saltResults.length === 0) {
+          return res.status(400).json({ msg: '잘못된 사용자명 또는 비밀번호입니다. 다시 시도해주세요.' });
           return res.status(500).json({ msg: 'Internal Server Error' });
         }
 
@@ -165,6 +170,8 @@ router.post('/login', async (req, res) => {
     }
   });
 });
+
+
 
 
 
@@ -223,6 +230,8 @@ router.post('/signup', upload.single('idCard'), (req, res) => {
   if (password !== checkPassword) {
     console.log('Passwords do not match');
     return res.status(400).json({ msg: '비밀번호가 일치하지 않습니다.' });
+    console.log('Passwords do not match');
+    return res.status(400).json({ msg: '비밀번호가 일치하지 않습니다.' });
   }
 
   const salt = Math.random().toString(36).substring(2, 15);
@@ -233,6 +242,8 @@ router.post('/signup', upload.single('idCard'), (req, res) => {
       const ssn = extractSSNFromText(text);
 
       if (!ssn) {
+        console.log('No valid SSN found in ID card');
+        return res.status(400).json({ msg: '주민등록증에서 유효한 주민번호를 찾을 수 없습니다.' });
         console.log('No valid SSN found in ID card');
         return res.status(400).json({ msg: '주민등록증에서 유효한 주민번호를 찾을 수 없습니다.' });
       }
@@ -267,8 +278,11 @@ router.post('/signup', upload.single('idCard'), (req, res) => {
     .catch(err => {
       console.error('Error during OCR:', err);
       return res.status(500).json({ msg: 'OCR 처리 중 오류가 발생했습니다.' });
+      console.error('Error during OCR:', err);
+      return res.status(500).json({ msg: 'OCR 처리 중 오류가 발생했습니다.' });
     });
 });
+
 
 
 // 주민번호 추출 로직 구현 
@@ -282,3 +296,4 @@ function extractSSNFromText(text) {
 }
 
 module.exports = router;
+

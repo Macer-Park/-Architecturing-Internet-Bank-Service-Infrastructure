@@ -9,7 +9,14 @@
         .navbar {
             background-color: #007bff;
         }
+        .navbar {
+            background-color: #007bff;
+        }
 
+        .navbar-brand,
+        .nav-link {
+            color: #fff !important;
+        }
         .navbar-brand,
         .nav-link {
             color: #fff !important;
@@ -18,7 +25,13 @@
         .nav-link {
             margin-right: 15px;
         }
+        .nav-link {
+            margin-right: 15px;
+        }
 
+        .nav-link:hover {
+            color: #cce7ff !important;
+        }
         .nav-link:hover {
             color: #cce7ff !important;
         }
@@ -26,11 +39,20 @@
         .navbar-toggler {
             border: none;
         }
+        .navbar-toggler {
+            border: none;
+        }
 
         .dropdown-menu {
             background-color: #007bff;
         }
+        .dropdown-menu {
+            background-color: #007bff;
+        }
 
+        .dropdown-item {
+            color: #fff !important;
+        }
         .dropdown-item {
             color: #fff !important;
         }
@@ -39,9 +61,16 @@
             background-color: #0056b3;
         }
     </style>
+        .dropdown-item:hover {
+            background-color: #0056b3;
+        }
+    </style>
 </head>
 <body>
 
+<nav class="navbar navbar-expand-lg navbar-dark">
+    <div class="container-fluid">
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
 <nav class="navbar navbar-expand-lg navbar-dark">
     <div class="container-fluid">
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
@@ -101,14 +130,6 @@
             location.href = '/auth/logout';
         }
 
-
-    // 회원가입 모달 제어
-    $(document).ready(function () {
-    $('#signupForm').on('submit', function (event) {
-        event.preventDefault(); // submit시, 창 새로고침 x
-
-        const formData = new FormData(this);
-
         $.ajax({
             type: 'POST',
             url: '/auth/signup',
@@ -128,19 +149,6 @@
                 $('#signupErrMsg').text(errorMessage).show();
             }
         });
-    });
-});
-
-
-    // 로그인 모달 제어
-    $(document).ready(function () {
-        $('#loginForm').on('submit', function (event) {
-            event.preventDefault(); // submit시, 창 새로고침 x
-
-            const formData = {
-                username: $('#user_id').val(),
-                password: $('#user_pw').val()
-            };
 
             $.ajax({
                 type: 'POST',
@@ -155,9 +163,8 @@
                     $('#loginErrMsg').text(response.responseJSON.msg).show();
                 }
             });
-        });
-    });
 </script>
 
 </body>
 </html>
+
