@@ -76,20 +76,28 @@ router.post("/verify", (req, res) => {
 
 // 로그인 페이지 렌더링
 router.get('/login', (req, res) => {
-  res.render('login');
+    const loginCSRFToken = res.locals.csrfToken;
+    req.session.csrfToken = loginCSRFToken;
+    res.render('login', { csrfToken: req.session.csrfToken });
 });
 
 // 사용자 로그인 API
 router.post('/login', async (req, res) => {
+
+  // CSRF token token
+  if(req.body._csrf != req.session.csrfToken){
+  
+    // CSRF token fail - 에러 처리
+    return res.status(403).send('Invalid CSRF token');
+  } 
+
   const { username, password } = req.body;
   const userQuery = 'SELECT * FROM user WHERE user_id = ?';
-
-
 
   main_db.query(userQuery, [username], (err, userResults) => {
     if (err) {
       console.error(err);
-      return res.status(500).send('Internal Server Error');
+      return res.status(500).json({ msg: 'Internal Server Error' });
     }
 
     if (userResults.length > 0) {
@@ -101,13 +109,15 @@ router.post('/login', async (req, res) => {
 
       const saltQuery = 'SELECT salt FROM salt WHERE user_id = ?';
       salt_db.query(saltQuery, [user.user_id], (err, saltResults) => {
+
         if (err) {
           console.error(err);
-          return res.status(500).send('Internal Server Error');
+          return res.status(500).json({ msg: 'Internal Server Error' });
         }
 
-        
-
+        if (saltResults.length === 0) {
+          return res.status(400).json({ msg: '잘못된 사용자명 또는 비밀번호입니다. 다시 시도해주세요.' });
+        }
 
         const salt = saltResults[0].salt;
         const hashedPassword = sha256(password + salt);
@@ -124,6 +134,7 @@ router.post('/login', async (req, res) => {
             if (user.user_type == "admin"){
               // 관리자 2차인증 거쳐야 한다.
               console.log("user.user_type : ", user.user_type);
+              res.render("adminTwo");
             } else {
               req.session.user = user;
               res.cookie('uid', username);
@@ -146,13 +157,16 @@ router.post('/login', async (req, res) => {
             }
             res.render('login', { msg: '잘못된 사용자명 또는 비밀번호입니다. 다시 시도해주세요.' });
           });
+
         }
       });
     } else {
-      res.render('login', { msg: '잘못된 사용자명 또는 비밀번호입니다. 다시 시도해주세요.' });
+      res.status(400).json({ msg: '잘못된 사용자명 또는 비밀번호입니다. 다시 시도해주세요.' });
     }
   });
 });
+
+
 
 // 사용자 로그아웃 API
 router.get('/logout', (req, res) => {
@@ -196,8 +210,19 @@ router.post('/signup', upload.single('idCard'), (req, res) => {
   const { username, password, checkPassword, name } = req.body;
   const idCardPath = req.file.path;
 
+  // 사용자 ID 중복 확인
+  const checkUserQuery = 'SELECT * FROM user WHERE user_id = ?';
+
+  main_db.query(checkUserQuery, [username], (err, results) =>{
+    if (err) {
+      console.error('Error checking user ID:', err);
+      return res.status(500).json({ msg: 'Internal Server Error' });
+    }
+  })
+
   if (password !== checkPassword) {
-    return res.render('signup', { msg: '비밀번호가 일치하지 않습니다.' });
+    console.log('Passwords do not match');
+    return res.status(400).json({ msg: '비밀번호가 일치하지 않습니다.' });
   }
 
   const salt = Math.random().toString(36).substring(2, 15);
@@ -208,35 +233,43 @@ router.post('/signup', upload.single('idCard'), (req, res) => {
       const ssn = extractSSNFromText(text);
 
       if (!ssn) {
-        return res.render('signup', { msg: '주민등록증에서 유효한 주민번호를 찾을 수 없습니다.' });
+        console.log('No valid SSN found in ID card');
+        return res.status(400).json({ msg: '주민등록증에서 유효한 주민번호를 찾을 수 없습니다.' });
       }
 
       const insertUserQuery = 'INSERT INTO user (user_id, user_pw, name, ssn, user_type, user_lock, connections) VALUES (?, ?, ?, ?, ?, ?, ?)';
       const insertSaltQuery = 'INSERT INTO salt (user_id, salt) VALUES (?, ?)';
 
       main_db.query(insertUserQuery, [username, hashedPassword, name, ssn, 'USER', 0, 0], (err, result) => {
-        if (err) {
-          console.error(err);
-          return res.status(500).send('Internal Server Error');
-        }
-
-        const userId = result.insertId;
 
         salt_db.query(insertSaltQuery, [username, salt], (err) => {
           if (err) {
-            console.error(err);
-            return res.status(500).send('Internal Server Error');
+            console.error('Error inserting user:', err);
+            return res.status(500).json({ msg: 'Internal Server Error' });
           }
 
-          res.redirect('/auth/login');
+          const userId = result.insertId;
+          console.log('User inserted with ID:', userId);
+
+          console.log('Executing query to insert salt...');
+          salt_db.query(insertSaltQuery, [userId, salt], (err) => {
+            if (err) {
+              console.error('Error inserting salt:', err);
+              return res.status(500).json({ msg: 'Internal Server Error' });
+            }
+
+            console.log('Salt inserted for user ID:', userId);
+            res.status(200).json({ msg: '회원가입이 완료되었습니다.' });
+          });
         });
       });
     })
     .catch(err => {
-      console.error(err);
-      return res.status(500).send('OCR 처리 중 오류가 발생했습니다.');
+      console.error('Error during OCR:', err);
+      return res.status(500).json({ msg: 'OCR 처리 중 오류가 발생했습니다.' });
     });
 });
+
 
 // 주민번호 추출 로직 구현 
 function extractSSNFromText(text) {

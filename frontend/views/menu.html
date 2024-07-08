@@ -6,56 +6,57 @@
     <title>Document</title>
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <style>
-    .navbar {
-        background-color: #007bff;
-    }
+        .navbar {
+            background-color: #007bff;
+        }
 
-    .navbar-brand,
-    .nav-link {
-        color: #fff !important;
-    }
+        .navbar-brand,
+        .nav-link {
+            color: #fff !important;
+        }
 
-    .nav-link {
-        margin-right: 15px;
-    }
+        .nav-link {
+            margin-right: 15px;
+        }
 
-    .nav-link:hover {
-        color: #cce7ff !important;
-    }
+        .nav-link:hover {
+            color: #cce7ff !important;
+        }
 
-    .navbar-toggler {
-        border: none;
-    }
+        .navbar-toggler {
+            border: none;
+        }
 
-    .dropdown-menu {
-        background-color: #007bff;
-    }
+        .dropdown-menu {
+            background-color: #007bff;
+        }
 
-    .dropdown-item {
-        color: #fff !important;
-    }
+        .dropdown-item {
+            color: #fff !important;
+        }
 
-    .dropdown-item:hover {
-        background-color: #0056b3;
-    }
-</style>
+        .dropdown-item:hover {
+            background-color: #0056b3;
+        }
+    </style>
 </head>
 <body>
 
-    <nav class="navbar navbar-expand-lg navbar-dark">
-        <div class="container-fluid">
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+<nav class="navbar navbar-expand-lg navbar-dark">
+    <div class="container-fluid">
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
                 aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item">
-                        <a class="nav-link active" aria-current="page" href="/">Home</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link active" aria-current="page" href="/">board</a>
-                    </li>
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item">
+                    <a class="nav-link active" aria-current="page" href="/">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link active" aria-current="page" href="/">board</a>
+                </li>
+                <div id="signDiv" class="nav-item-group">
                     <li class="nav-item">
                         <a class="nav-link active" aria-current="page" href="/">MyPage</a>
                     </li>
@@ -100,61 +101,63 @@
             location.href = '/auth/logout';
         }
 
-        // 회원가입 모달 제어
-        $(document).ready(function () {
-            $('#signupForm').on('submit', function (event) {
-                event.preventDefault(); // submit시, 창 새로고침 x
 
-                const formData = {
-                    user_id: $('#signupId').val(),
-                    user_pw: $('#signupPw').val(),
-                    name: $('#signupName').val(),
-                    birthday: $('#signupBirth').val()
-                };
+    // 회원가입 모달 제어
+    $(document).ready(function () {
+    $('#signupForm').on('submit', function (event) {
+        event.preventDefault(); // submit시, 창 새로고침 x
 
-                $.ajax({
-                    type: 'POST',
-                    url: '/auth/signup',
-                    data: formData,
-                    success: function (response) { // 회원가입 성공
-                        $('#signupErrMsg').hide();
-                        alert(response.msg);
-                        $('#signupModal').modal('hide'); // 모달 창 닫기
-                    },
-                    error: function (response) { // 회원가입 실패 시 에러
-                        $('#signupErrMsg').text(response.responseJSON.msg).show();
-                    }
-                });
+        const formData = new FormData(this);
+
+        $.ajax({
+            type: 'POST',
+            url: '/auth/signup',
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function (response) { // 회원가입 성공
+                $('#signupErrMsg').hide();
+                alert(response.msg);
+                $('#signupModal').modal('hide'); // 모달 창 닫기
+            },
+            error: function (response) { // 회원가입 실패 시 에러
+                let errorMessage = '알 수 없는 오류가 발생했습니다.';
+                if (response.responseJSON && response.responseJSON.msg) {
+                    errorMessage = response.responseJSON.msg;
+                }
+                $('#signupErrMsg').text(errorMessage).show();
+            }
+        });
+    });
+});
+
+
+    // 로그인 모달 제어
+    $(document).ready(function () {
+        $('#loginForm').on('submit', function (event) {
+            event.preventDefault(); // submit시, 창 새로고침 x
+
+            const formData = {
+                username: $('#user_id').val(),
+                password: $('#user_pw').val()
+            };
+
+            $.ajax({
+                type: 'POST',
+                url: '/auth/login',
+                data: formData,
+                success: function (response) { // 로그인 성공
+                    $('#loginErrMsg').hide();
+                    alert(response.msg);
+                    $('#loginModal').modal('hide'); // 모달 창 닫기
+                },
+                error: function (response) { // 로그인 실패 시 에러
+                    $('#loginErrMsg').text(response.responseJSON.msg).show();
+                }
             });
         });
-
-        // 로그인 모달 제어
-        $(document).ready(function () {
-            $('#loginForm').on('submit', function (event) {
-                console.log("asdasdas");
-                event.preventDefault(); // submit시, 창 새로고침 x
-
-                const formData = {
-                    userid: $('#user_id').val(),
-                    userpw: $('#user_pw').val()
-                };
-
-                $.ajax({
-                    type: 'POST',
-                    url: '/auth/login',
-                    data: formData,
-                    success: function (response) { // 로그인 성공
-                        $('#loginErrMsg').hide();
-                        alert(response.msg);
-                        $('#loginModal').modal('hide'); // 모달 창 닫기
-                    },
-                    error: function (response) { // 로그인 실패 시 에러
-                        $('#loginErrMsg').text(response.responseJSON.msg).show();
-                    }
-                });
-            });
-        });
-    </script>
+    });
+</script>
 
 </body>
 </html>
