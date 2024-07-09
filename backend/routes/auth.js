@@ -6,6 +6,10 @@ const Tesseract = require("tesseract.js");
 const path = require("path");
 const fs = require("fs");
 
+// csrf 보호 설정
+const csrf = require('csurf');
+const csrfProtection = csrf({ cookie: true });
+
 let main_db, salt_db;
 
 (async () => {
@@ -75,21 +79,22 @@ router.post("/verify", (req, res) => {
 /************************************************************************************************************************************ */
 
 // 로그인 페이지 렌더링
-router.get('/login', (req, res) => {
-    const loginCSRFToken = res.locals.csrfToken;
-    req.session.csrfToken = loginCSRFToken;
-    res.render('login', { csrfToken: req.session.csrfToken });
+router.get('/login', csrfProtection, (req, res) => {
+  console.log(req.csrfToken());
+  res.render('login', { csrfToken: req.csrfToken() });
 });
 
-// 사용자 로그인 API
-router.post('/login', async (req, res) => {
 
-  // CSRF token token
-  if(req.body._csrf != req.session.csrfToken){
-  
-    // CSRF token fail - 에러 처리
-    return res.status(403).send('Invalid CSRF token');
-  } 
+// 사용자 로그인 API
+router.post('/login', csrfProtection, async (req, res) => {
+
+  // CSRF 토큰은 미들웨어가 자동으로 검증
+  // // CSRF token token
+  // if(req.body._csrf != req.session.csrfToken){
+  //
+  //   // CSRF token fail - 에러 처리
+  //   return res.status(403).send('Invalid CSRF token');
+  // }
 
   const { username, password } = req.body;
   const userQuery = 'SELECT * FROM user WHERE user_id = ?';

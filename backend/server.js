@@ -79,7 +79,7 @@ app.use('/user', require('./routes/user'));
 app.use('/account', require('./routes/account'));
 app.use('/admin', require('./routes/admin'));
 app.use('/board', csrfProtection, require('./routes/board')); // CSRF 보호 적용
-app.use('/auth', require('./routes/auth'));
+app.use('/auth', csrfProtection, require('./routes/auth'));
 
 /****** 미들웨어 설정 End *******/
 
