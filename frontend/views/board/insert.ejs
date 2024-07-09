@@ -7,6 +7,9 @@
     <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
   </head>
   <body>
+
+  <%- include('../menu.html') %>
+
     <div class="container">
       <h1 class="mt-4">공지사항 추가</h1>
       <form action="/board/insert" method="post">
@@ -30,6 +33,12 @@
         <button type="submit" class="btn btn-primary">추가</button>
       </form>
     </div>
+
+
+  <div class="footer">
+    © 2024 클라우드 엔지니어 양성 과정 1기생 Mini Project 4팀. 모든 권리 보유.
+  </div>
+
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>

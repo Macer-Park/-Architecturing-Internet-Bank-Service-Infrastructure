@@ -7,8 +7,21 @@
   <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
+
+<%- include('../menu.html') %>
+
 <div class="container">
-  <h1 class="mt-4">인터넷뱅킹 고객센터</h1>
+  <p></p>
+  <div>
+    <h1 class="mt-4">인터넷뱅킹 고객센터</h1>
+    <% if (user && user.user_type === 'admin') { %>
+        <p></p>
+        <h5>관리자로 로그인 되었습니다.</h5>
+        <p></p>
+    <% } %>
+  </div>
+  <p></p>
+
 
   <!-- 탭 메뉴 -->
   <ul class="nav nav-tabs">
@@ -24,32 +37,39 @@
   </ul>
 
   <div class="mb-3 mt-3">
+
     <% if (user && user.user_type === 'admin') { %>
-      <a href="/board/insert" class="btn btn-primary">글 작성</a>
+      <a href="/board/insert" class="btn btn-primary"> 글 작성 </a>
     <% } %>
   </div>
 
   <table class="table table-striped">
     <thead>
     <tr>
-      <th>ID</th>
+      <th>No.</th>
       <th>제목</th>
       <th>작성일</th>
+      <% if (user && user.user_type === 'admin') { %>
       <th>삭제</th>
+      <% } %>
     </tr>
     </thead>
     <tbody>
+    <% let itemNo = (currentPage - 1) * 10 + 1; %>
     <% data.forEach(board => { %>
       <tr>
-        <td><%= board.board_id %></td>
+        <td><%= itemNo++ %></td>
         <td><a href="/board/content/<%= board.board_id %>"><%= board.title %></a></td>
-        <td><%= new Date(board.created_at).toLocaleString() %></td>
+        <td><%= board.created_at %></td>
+        <% if (user && user.user_type === 'admin') { %>
         <td>
           <form action="/board/delete" method="post" onsubmit="return confirm('정말 삭제하시겠습니까?');">
             <input type="hidden" name="board_id" value="<%= board.board_id %>">
+            <input type="hidden" name="_csrf" value="<%= csrfToken %>">
             <button type="submit" class="btn btn-danger btn-sm">삭제</button>
           </form>
         </td>
+        <% } %>
       </tr>
     <% }) %>
     </tbody>
@@ -79,8 +99,13 @@
       <% } %>
     </ul>
   </nav>
-
 </div>
+
+
+<div class="footer">
+  © 2024 클라우드 엔지니어 양성 과정 1기생 Mini Project 4팀. 모든 권리 보유.
+</div>
+
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>

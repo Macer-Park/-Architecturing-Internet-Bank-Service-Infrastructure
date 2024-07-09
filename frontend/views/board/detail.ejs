@@ -5,10 +5,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>공지사항 상세</title>
     <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+      .card {
+        margin-top: 80px;
+      }
+    </style>
   </head>
   <body>
+  <%- include('../menu.html') %>
+
     <div class="container">
-      <h1 class="mt-4">공지사항 상세</h1>
+
       <div class="card">
         <div class="card-header">
           <h2><%= board.title %></h2>
@@ -21,13 +28,18 @@
           <% } %>
         </div>
         <div class="card-footer">
-          <a href="/board/list" class="btn btn-secondary">목록으로</a>
-          <% if (user && user.user_type === 'admin') { %>
+          <a href="/board/list/default" class="btn btn-secondary">목록으로</a>
+<!--          <% if (user && user.user_type === 'admin') { %>-->
           <a href="/board/update/<%= board.board_id %>" class="btn btn-warning">수정</a>
-          <% } %>
+<!--          <% } %>-->
         </div>
       </div>
     </div>
+
+  <div class="footer">
+    © 2024 클라우드 엔지니어 양성 과정 1기생 Mini Project 4팀. 모든 권리 보유.
+  </div>
+
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>

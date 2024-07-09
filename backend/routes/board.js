@@ -1,16 +1,9 @@
 const router = require("express").Router();
 const { checkDbConnection } = require("../common/utils/dbUtils");
 
+// csrf 보호 설정
 const csrf = require('csurf');
 const csrfProtection = csrf({ cookie: true });
-
-// CSRF 토큰을 모든 뷰에 전역으로 전달
-// router.use(csrfProtection); // 모든 라우트에 CSRF 미들웨어 적용
-
-// router.use(function(req, res, next) {
-//   res.locals.csrfToken = req.csrfToken();
-//   next();
-// });
 
 // 특정 카테고리의 게시물 목록
 router.get('/list/:category', csrfProtection, async (req, res) => {
@@ -33,6 +26,17 @@ router.get('/list/:category', csrfProtection, async (req, res) => {
         // 항목 목록 가져오기
         const [rows] = await main_db.query(listQuery, [category, itemsPerPage, offset]);
 
+        // yyyy-mm-dd 형식으로 변환
+        rows.forEach(row => {
+            row.created_at = row.created_at.toISOString().split('T')[0];
+        });
+
+        // 테스트 session user
+        req.session.user = {
+            user_id: 'admin',
+            user_type: 'admin'
+        };
+
         res.render('board/list', {
             user: req.session.user,
             data: rows,
@@ -49,6 +53,8 @@ router.get('/list/:category', csrfProtection, async (req, res) => {
 
 // 공지사항 상세
 router.get('/content/:id', async (req, res) => {
+
+
     const board_id = req.params.id;
     const query = `SELECT * FROM board WHERE board_id = ?`;
 
@@ -69,18 +75,25 @@ router.get('/content/:id', async (req, res) => {
 
 // 공지사항 추가 폼
 router.get('/insert', csrfProtection, (req, res) => {
-    if (!req.session.user || req.session.user.user_type.toLowerCase() !== 'admin') {
-        return res.status(403).send('권한이 없습니다');
-    }
+
+    // req.session.user.user_type = 'admin';
+    //
+    // if (!req.session.user || req.session.user.user_type.toLowerCase() !== 'admin') {
+    //     return res.status(403).send('권한이 없습니다');
+    // }
     res.render('board/insert', { user: req.session.user, csrfToken: req.csrfToken() });
 });
 
 
 // 공지사항 추가 처리
 router.post('/insert', csrfProtection, async (req, res) => {
-    if (!req.session.user || req.session.user.user_type.toLowerCase() !== 'admin') {
-        return res.status(403).send('권한이 없습니다');
-    }
+
+    // req.session.user.user_type = 'admin';
+    //
+    //
+    // if (!req.session.user || req.session.user.user_type.toLowerCase() !== 'admin') {
+    //     return res.status(403).send('권한이 없습니다');
+    // }
 
     const { title, content, category } = req.body;
     const query = `INSERT INTO board (title, content, category) VALUES (?, ?, ?)`;
@@ -98,9 +111,9 @@ router.post('/insert', csrfProtection, async (req, res) => {
 
 // 공지사항 수정 페이지
 router.get('/update/:id', async (req, res) => {
-    if (!req.session.user || req.session.user.user_type.toLowerCase() !== 'admin') {
-        return res.status(403).send('권한이 없습니다');
-    }
+    // if (!req.session.user || req.session.user.user_type.toLowerCase() !== 'admin') {
+    //     return res.status(403).send('권한이 없습니다');
+    // }
     const main_db = await checkDbConnection();
     const board_id = req.params.id;
     const query = `SELECT * FROM board WHERE board_id = ?`;
@@ -120,9 +133,9 @@ router.get('/update/:id', async (req, res) => {
 
 // 공지사항 수정 처리
 router.post('/update/:id', csrfProtection, async (req, res) => {
-    if (!req.session.user || req.session.user.user_type.toLowerCase() !== 'admin') {
-        return res.status(403).send('권한이 없습니다');
-    }
+    // if (!req.session.user || req.session.user.user_type.toLowerCase() !== 'admin') {
+    //     return res.status(403).send('권한이 없습니다');
+    // }
     const { title, content } = req.body;
     const board_id = req.params.id;
     const query = `UPDATE board SET title = ?, content = ?, updated_at = NOW() WHERE board_id = ?`;
@@ -138,7 +151,7 @@ router.post('/update/:id', csrfProtection, async (req, res) => {
 });
 
 // 공지사항 삭제
-router.post('/delete', async (req, res) => {
+router.post('/delete', csrfProtection, async (req, res) => {
     const { board_id } = req.body;
     const query = `DELETE FROM board WHERE board_id = ?`;
 

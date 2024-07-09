@@ -13,14 +13,14 @@
             background-color: #007bff;
         }
 
-        .navbar-brand,
-        .nav-link {
-            color: #fff !important;
-        }
-        .navbar-brand,
-        .nav-link {
-            color: #fff !important;
-        }
+        /*.navbar-brand,*/
+        /*.nav-link {*/
+        /*    color: #fff !important;*/
+        /*}*/
+        /*.navbar-brand,*/
+        /*.nav-link {*/
+        /*    color: #fff !important;*/
+        /*}*/
 
         .nav-link {
             margin-right: 15px;
@@ -43,26 +43,39 @@
             border: none;
         }
 
-        .dropdown-menu {
+        /*.dropdown-menu {*/
+        /*    background-color: #007bff;*/
+        /*}*/
+        /*.dropdown-menu {*/
+        /*    background-color: #007bff;*/
+        /*}*/
+
+        /*.dropdown-item {*/
+        /*    color: #fff !important;*/
+        /*}*/
+        /*.dropdown-item {*/
+        /*    color: #fff !important;*/
+        /*}*/
+
+        /*.dropdown-item:hover {*/
+        /*    background-color: #0056b3;*/
+        /*}*/
+
+        /*.dropdown-item:hover {*/
+        /*    background-color: #0056b3;*/
+        /*}*/
+
+
+
+
+        .footer {
             background-color: #007bff;
-        }
-        .dropdown-menu {
-            background-color: #007bff;
-        }
-
-        .dropdown-item {
-            color: #fff !important;
-        }
-        .dropdown-item {
-            color: #fff !important;
-        }
-
-        .dropdown-item:hover {
-            background-color: #0056b3;
-        }
-
-        .dropdown-item:hover {
-            background-color: #0056b3;
+            color: white;
+            padding: 10px;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            text-align: center;
         }
     </style>
 </head>
@@ -97,21 +110,21 @@
             </div>
         </div>
     </nav>
-    
 
-    
+
+
     <!-- Bootstrap JS & dependencies -->
     <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>    
-    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+
     <script>
         // uid 쿠키 확인
         const uid = $.cookie('uid');
 
-        // 쿠키 O -> logout button 
+        // 쿠키 O -> logout button
         if (uid) {
             $('.login').html(`<li class="nav-item">
                                     <a class="nav-link" href="javascript:void(0);" onclick="logout()">Logout</a>
