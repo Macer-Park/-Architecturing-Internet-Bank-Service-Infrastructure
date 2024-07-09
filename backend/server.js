@@ -11,6 +11,11 @@ const crypto = require("crypto");
 const cookieParser = require('cookie-parser');
 const csrf = require('csurf');
 
+
+
+
+
+
 const app = express();
 
 /***********************************************************************************/
@@ -19,25 +24,25 @@ const app = express();
 /** https 설정 - 개발시에는 주석처리하고, 푸쉬 할 때는 해제를 해야한다. (반드시)
  * 그래야, 외부서버에서 https 외부서버를 사용할 수 있다.
  */
- //  HTTPS 옵션 설정 (사용할 경우)
- const httpsOptions = {
-   cert: fs.readFileSync('/home/team4/cert/certificate.crt'),
-   key: fs.readFileSync('/home/team4/cert/private.key'),
-   ca: fs.readFileSync('/home/team4/cert/ca_bundle.crt')
- };
+//  //  HTTPS 옵션 설정 (사용할 경우)
+//  const httpsOptions = {
+//    cert: fs.readFileSync('/home/team4/cert/certificate.crt'),
+//    key: fs.readFileSync('/home/team4/cert/private.key'),
+//    ca: fs.readFileSync('/home/team4/cert/ca_bundle.crt')
+//  };
 
- // HTTPS 서버 시작 (사용할 경우)
- https.createServer(httpsOptions, app).listen(443, () => {
-   console.log('443 HTTPS 서버 대기중');
- });
+//  // HTTPS 서버 시작 (사용할 경우)
+//  https.createServer(httpsOptions, app).listen(443, () => {
+//    console.log('443 HTTPS 서버 대기중');
+//  });
 
- // // HTTP에서 HTTPS로 리다이렉션 (사용할 경우)
- app.use((req, res, next) => {
-   if (!req.secure) {
-     return res.redirect(['https://', req.get('Host'), req.url].join(''));
-   }
-   next();
- });
+//  // // HTTP에서 HTTPS로 리다이렉션 (사용할 경우)
+//  app.use((req, res, next) => {
+//    if (!req.secure) {
+//      return res.redirect(['https://', req.get('Host'), req.url].join(''));
+//    }
+//    next();
+//  });
 
 /***********************************************************************************/
 /***********************************************************************************/
@@ -77,15 +82,15 @@ app.use((req, res, next) => {
 // 라우팅 포함하는 코드
 app.use('/user', require('./routes/user'));
 app.use('/account', require('./routes/account'));
-app.use('/admin', require('./routes/admin'));
+app.use('/admin', csrfProtection, require('./routes/admin'));
 app.use('/board', csrfProtection, require('./routes/board')); // CSRF 보호 적용
 app.use('/auth', csrfProtection, require('./routes/auth'));
 
 /****** 미들웨어 설정 End *******/
 
 // HTTP 서버 시작
-app.listen(80, () => {
-  console.log('80 HTTP 서버 대기중');
+app.listen(8080, () => {
+  console.log('8080 HTTP 서버 대기중');
 });
 
 // 홈 페이지 렌더링

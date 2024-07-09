@@ -79,7 +79,7 @@
         <div class="d-flex justify-content-center mt-3">
             <span id="goVerify">
                 <div class="input-group mb-3">
-                    
+                    <input type="hidden"  id="csrfToken" name="_csrf" value="<%= csrfToken %>">
                     <input type="text" class="form-control" id="verificationCode" placeholder="Enter verification code">
                     <p></p>
                     <button class="btn btn-success" onclick="verifyBtn()">Verify</button>
@@ -91,11 +91,13 @@
     <script>
         function verifyBtn() {
             const code = $('#verificationCode').val();
+            const csrfToken2 = $('#csrfToken').val();
             console.log("code : ", code);
+            console.log("csrfToken2 : ", csrfToken2);
             $.ajax({
                 type: 'POST',
                 url: '/auth/verify',
-                data: JSON.stringify({ code: code }),
+                data: JSON.stringify({ code: code, csrfToken : csrfToken2}),
                 contentType: 'application/json',
                 success: function(response) {
                     alert(response.msg);

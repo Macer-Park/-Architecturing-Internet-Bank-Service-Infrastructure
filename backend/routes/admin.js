@@ -2,7 +2,8 @@ const router = require("express").Router();
 const setup = require("../db_setup");
 const XLSX = require('xlsx');
 
-
+const csrf = require('csurf');
+const csrfProtection = csrf({ cookie: true });
 
 // 사용자 계정 잠금 API
 router.post('/lock', async (req, res) => {

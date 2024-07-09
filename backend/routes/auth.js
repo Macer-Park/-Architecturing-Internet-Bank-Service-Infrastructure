@@ -50,14 +50,17 @@ const qrcode = require('qrcode');
 // })
 
 /** 관리자 2차 인증 url */
-router.get("/verify", async (req,res) => {
-  res.render("adminTwo");
+router.get("/verify",csrfProtection,  async (req,res) => {
+  console.log(req.csrfToken());
+  res.render('adminTwo', { csrfToken: req.csrfToken() });
 })
 
-router.post("/verify", (req, res) => {
+router.post("/verify", csrfProtection, (req, res) => {
 
   const code = req.body.code;
+  const csrfToken = req.body.csrfToken;
   console.log("code : ", code);
+  console.log("csrfToken : ", csrfToken);
   // ajax를 통해 전달받은 데이터를 token에다가 넣어야 한다.
   var verified = speakeasy.totp.verify({
     secret: "dz81bN1ZwsXKKzzo>>3e}lsBV9v<1Ow9", // qrcode ascii를 요기다가 넣어주면 된다.
@@ -122,7 +125,6 @@ router.post('/login', csrfProtection, async (req, res) => {
 
         if (saltResults.length === 0) {
           return res.status(400).json({ msg: '잘못된 사용자명 또는 비밀번호입니다. 다시 시도해주세요.' });
-          return res.status(500).json({ msg: 'Internal Server Error' });
         }
 
         if (saltResults.length === 0) {
@@ -144,11 +146,11 @@ router.post('/login', csrfProtection, async (req, res) => {
             if (user.user_type == "admin"){
               // 관리자 2차인증 거쳐야 한다.
               console.log("user.user_type : ", user.user_type);
-              res.render("adminTwo");
+              res.render('adminTwo', { csrfToken: req.csrfToken() });
             } else {
               req.session.user = user;
               res.cookie('uid', username);
-              res.redirect('/');
+              res.render("index", {data : req.session.user});
             }
           });
         } else {
@@ -175,9 +177,6 @@ router.post('/login', csrfProtection, async (req, res) => {
     }
   });
 });
-
-
-
 
 
 // 사용자 로그아웃 API
