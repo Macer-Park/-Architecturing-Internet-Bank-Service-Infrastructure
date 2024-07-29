@@ -80,5 +80,5 @@ git push origin feature/new-feature
 ```
 6. Open a pull request.
 
-###License
+### License
 This project is licensed under the MIT License. See the LICENSE file for details.
