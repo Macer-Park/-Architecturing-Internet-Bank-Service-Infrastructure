@@ -3,7 +3,6 @@ const session = require('express-session');
 const sha256 = require('sha256');
 const fs = require('fs');
 const path = require('path');
-const https = require('https');
 const setup = require("./db_setup");
 const dotenv = require("dotenv").config();
 const bodyParser = require("body-parser");
